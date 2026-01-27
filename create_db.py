@@ -9,7 +9,7 @@ def create_database():
         print(">> Old tables dropped and new tables created.")
         
         # 2. Create Admin
-        admin = User(username='admin', email='admin@atipriya.com', is_admin=True)
+        admin = User(username='admin', email='madhurguptaofficial@gmail.com', is_admin=True)
         admin.set_password('admin123')
         db.session.add(admin)
         print(">> Admin account created.")
