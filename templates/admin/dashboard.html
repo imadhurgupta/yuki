@@ -1,0 +1,424 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container-fluid bg-light min-vh-100 py-5">
+    <div class="container">
+
+        <div class="row mb-5 align-items-center">
+            <div class="col-md-6">
+                <h2 class="fw-bold text-dark mb-0">Admin Dashboard</h2>
+                <p class="text-muted mb-0">Manage orders, customers, and inventory.</p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <button class="btn btn-primary px-4 py-2 rounded-pill shadow-sm hover-scale" data-bs-toggle="modal"
+                    data-bs-target="#addProductModal">
+                    <i class="fas fa-plus me-2"></i>Add New Product
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted fw-bold text-uppercase small mb-1">Total Orders</p>
+                            <h3 class="fw-bold mb-0">{{ orders|length }}</h3>
+                        </div>
+                        <div class="icon-square bg-primary bg-opacity-10 text-primary rounded-circle">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted fw-bold text-uppercase small mb-1">Pending</p>
+                            {% set pending_count = namespace(value=0) %}
+                            {% for o in orders %}{% if o.status == 'Pending' %}{% set pending_count.value =
+                            pending_count.value + 1 %}{% endif %}{% endfor %}
+                            <h3 class="fw-bold mb-0 text-warning">{{ pending_count.value }}</h3>
+                        </div>
+                        <div class="icon-square bg-warning bg-opacity-10 text-warning rounded-circle">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted fw-bold text-uppercase small mb-1">Products</p>
+                            <h3 class="fw-bold mb-0">{{ products|length }}</h3>
+                        </div>
+                        <div class="icon-square bg-success bg-opacity-10 text-success rounded-circle">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted fw-bold text-uppercase small mb-1">Revenue</p>
+                            {% set total_rev = namespace(value=0) %}
+                            {% for o in orders %}{% set total_rev.value = total_rev.value + o.total_price %}{% endfor %}
+                            <h3 class="fw-bold mb-0">₹{{ "%.0f"|format(total_rev.value) }}</h3>
+                        </div>
+                        <div class="icon-square bg-info bg-opacity-10 text-info rounded-circle">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-white p-1 border-0">
+                <ul class="nav nav-pills nav-fill" id="adminTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold py-3 active rounded-4" id="orders-tab" data-bs-toggle="tab"
+                            data-bs-target="#orders" type="button">
+                            <i class="fas fa-list-ul me-2"></i>Orders
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold py-3 rounded-4" id="products-tab" data-bs-toggle="tab"
+                            data-bs-target="#products" type="button">
+                            <i class="fas fa-th-large me-2"></i>Inventory
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="adminTabsContent">
+
+            <div class="tab-pane fade show active" id="orders" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4 py-3 small fw-bold text-muted text-uppercase">Txn ID</th>
+                                        <th class="py-3 small fw-bold text-muted text-uppercase" style="width: 25%;">
+                                            Customer Info</th>
+                                        <th class="py-3 small fw-bold text-muted text-uppercase" style="width: 25%;">
+                                            Product Details</th>
+                                        <th class="py-3 small fw-bold text-muted text-uppercase">Total</th>
+                                        <th class="py-3 small fw-bold text-muted text-uppercase">Status</th>
+                                        <th class="pe-4 py-3 small fw-bold text-muted text-uppercase text-end">Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td class="ps-4 align-top py-3">
+                                            <span class="badge bg-light text-dark border font-monospace">#{{
+                                                order.transaction_id }}</span>
+                                            <div class="small text-muted mt-1">{{ order.date_ordered.strftime('%d %b,
+                                                %I:%M %p') }}</div>
+                                            <div class="mt-2">
+                                                {% if order.payment_method == 'UPI' %}
+                                                <span
+                                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">UPI</span>
+                                                {% elif order.payment_method == 'COD' %}
+                                                <span
+                                                    class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2">COD</span>
+                                                {% else %}
+                                                <span
+                                                    class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2">Card</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+
+                                        <td class="align-top py-3">
+                                            <div class="d-flex flex-column gap-2">
+                                                <div class="d-flex align-items-center text-dark fw-bold">
+                                                    <i class="fas fa-user-circle me-2 text-muted"></i>
+                                                    {{ order.full_name }}
+                                                </div>
+                                                <div class="d-flex align-items-center text-muted small">
+                                                    <i class="fas fa-phone me-2 text-dark"></i>
+                                                    {{ order.mobile_number }}
+                                                </div>
+                                                <div class="d-flex align-items-start text-muted small">
+                                                    <i class="fas fa-map-marker-alt me-2 text-danger mt-1"></i>
+                                                    <span>{{ order.address }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="align-top py-3">
+                                            <div class="d-flex mb-3">
+                                                {% if order.product.image_file %}
+                                                <img src="{{ url_for('static', filename='uploads/' + order.product.image_file) }}"
+                                                    class="rounded border me-3" width="60" height="60"
+                                                    style="object-fit: cover;">
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="fw-bold mb-1 text-dark">{{ order.product.name }}</h6>
+                                                    <div class="d-flex gap-1">
+                                                        <span class="badge bg-white text-dark border rounded-1">Size: {{
+                                                            order.size }}</span>
+                                                        <span class="badge bg-white text-dark border rounded-1">Qty: {{
+                                                            order.quantity }}</span>
+                                                        {% if order.color %}
+                                                        <span class="badge bg-white text-dark border rounded-1">
+                                                            <i class="fas fa-circle"
+                                                                style="color: {{ order.color|lower }}; text-shadow: 0 0 1px #999;"></i>
+                                                            {{ order.color }}
+                                                        </span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="bg-light border rounded p-2">
+                                                <div class="small fw-bold text-muted text-uppercase mb-2"
+                                                    style="font-size: 0.7rem;">Personalization</div>
+                                                {% if order.custom_text %}
+                                                <div class="mb-2 small">
+                                                    <span class="text-muted">Text:</span> <span
+                                                        class="fw-bold text-dark">"{{ order.custom_text }}"</span>
+                                                </div>
+                                                {% endif %}
+
+                                                {% if order.instructions %}
+                                                <div class="mb-2 small text-danger">
+                                                    <i class="fas fa-info-circle me-1"></i> {{ order.instructions }}
+                                                </div>
+                                                {% endif %}
+
+                                                {% if order.customization_file %}
+                                                <a href="{{ url_for('static', filename='uploads/' + order.customization_file) }}"
+                                                    class="btn btn-dark w-100 btn-sm fw-bold" download>
+                                                    <i class="fas fa-file-download me-2"></i> DOWNLOAD DESIGN
+                                                </a>
+                                                {% else %}
+                                                <button class="btn btn-light w-100 btn-sm text-muted border" disabled>No
+                                                    Design Uploaded</button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+
+                                        <td class="align-top py-3 fw-bold text-dark">₹{{ order.total_price }}</td>
+                                        <td class="align-top py-3">
+                                            <span class="badge rounded-pill px-3 py-2 
+                                            {% if order.status == 'Delivered' %}bg-success text-success bg-opacity-10
+                                            {% elif order.status == 'Shipped' %}bg-info text-dark bg-opacity-25
+                                            {% else %}bg-warning text-dark bg-opacity-25{% endif %}">
+                                                {{ order.status }}
+                                            </span>
+                                        </td>
+
+                                        <td class="align-top py-3 pe-4 text-end">
+                                            <form action="{{ url_for('admin_bp.update_order', order_id=order.id) }}"
+                                                method="POST">
+                                                <select name="status"
+                                                    class="form-select form-select-sm border shadow-none"
+                                                    style="width: 130px; float: right;" onchange="this.form.submit()">
+                                                    <option value="Pending" {% if order.status=='Pending' %}selected{%
+                                                        endif %}>Pending</option>
+                                                    <option value="Processing" {% if order.status=='Processing'
+                                                        %}selected{% endif %}>Processing</option>
+                                                    <option value="Shipped" {% if order.status=='Shipped' %}selected{%
+                                                        endif %}>Shipped</option>
+                                                    <option value="Delivered" {% if order.status=='Delivered'
+                                                        %}selected{% endif %}>Delivered</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">No orders found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="products" role="tabpanel">
+                <div class="row g-4">
+                    {% for product in products %}
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
+                            <div class="position-relative">
+                                {% if product.image_file %}
+                                <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
+                                    class="card-img-top p-3 rounded-5" style="height: 200px; object-fit: contain;">
+                                {% else %}
+                                <div class="bg-light p-5 text-center text-muted" style="height: 200px;">No Image</div>
+                                {% endif %}
+                                <span class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">{{
+                                    product.category }}</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="fw-bold mb-1 text-truncate">{{ product.name }}</h5>
+                                <p class="text-primary fw-bold mb-3">₹{{ product.base_price }}</p>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-light btn-sm flex-grow-1 fw-bold text-muted"
+                                        data-bs-toggle="modal" data-bs-target="#editModal{{ product.id }}">Edit</button>
+                                    <form action="{{ url_for('admin_bp.delete_product', product_id=product.id) }}"
+                                        method="POST" onsubmit="return confirm('Delete this product?');">
+                                        <button class="btn btn-light btn-sm text-danger"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="editModal{{ product.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content rounded-4 border-0">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h5 class="modal-title fw-bold">Edit Product</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('admin_bp.edit_product', product_id=product.id) }}"
+                                            method="POST" enctype="multipart/form-data">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" name="name" class="form-control"
+                                                    value="{{ product.name }}" required>
+                                                <label>Name</label>
+                                            </div>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-6 form-floating">
+                                                    <input type="number" name="price" step="0.01" class="form-control"
+                                                        value="{{ product.base_price }}" required>
+                                                    <label>Price</label>
+                                                </div>
+                                                <div class="col-6 form-floating">
+                                                    <select name="category" class="form-select">
+                                                        <option value="General" {% if product.category=='General'
+                                                            %}selected{% endif %}>General</option>
+                                                        <option value="T-Shirts" {% if product.category=='T-Shirts'
+                                                            %}selected{% endif %}>T-Shirts</option>
+                                                        <option value="Mugs" {% if product.category=='Mugs' %}selected{%
+                                                            endif %}>Mugs</option>
+                                                        <option value="Hoodies" {% if product.category=='Hoodies'
+                                                            %}selected{% endif %}>Hoodies</option>
+                                                    </select>
+                                                    <label>Category</label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="small fw-bold">Sizes</label>
+                                                <input type="text" name="sizes" class="form-control"
+                                                    value="{{ product.sizes or '' }}">
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary rounded-pill fw-bold">Save
+                                                    Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-center py-5 text-muted">Inventory Empty</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Add New Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('admin_bp.add_product') }}" method="POST" enctype="multipart/form-data">
+                    <div class="form-floating mb-3">
+                        <input type="text" name="name" class="form-control" placeholder="Name" required>
+                        <label>Product Name</label>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 form-floating">
+                            <input type="number" name="price" step="0.01" class="form-control" placeholder="Price"
+                                required>
+                            <label>Price</label>
+                        </div>
+                        <div class="col-6 form-floating">
+                            <select name="category" class="form-select">
+                                <option value="General">General</option>
+                                <option value="T-Shirts">T-Shirts</option>
+                                <option value="Mugs">Mugs</option>
+                                <option value="Hoodies">Hoodies</option>
+                            </select>
+                            <label>Category</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">Image</label>
+                        <input type="file" name="image" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">Sizes</label>
+                        <input type="text" name="sizes" class="form-control" placeholder="e.g. S, M, L">
+                    </div>
+                    <div class="d-grid pt-2">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold">Create Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .icon-square {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+        transition: all 0.2s;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s;
+    }
+
+    .nav-pills .nav-link {
+        color: #6c757d;
+        background: transparent;
+        transition: all 0.3s;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: #0df9fd;
+        color: white;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+    }
+
+    .font-monospace {
+        font-family: 'Courier New', Courier, monospace;
+        letter-spacing: -0.5px;
+    }
+</style>
+{% endblock %}

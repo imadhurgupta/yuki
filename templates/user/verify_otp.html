@@ -1,0 +1,38 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white py-3 text-center">
+                    <h4 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Verify OTP</h4>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="text-muted mb-4">
+                        We have sent a 6-digit code to your email.<br>
+                        Please enter it below to continue.
+                    </p>
+
+                    <form method="POST">
+                        <div class="mb-4">
+                            <input type="text" name="otp"
+                                class="form-control form-control-lg text-center fw-bold letter-spacing-2"
+                                placeholder="X X X X X X" maxlength="6" required
+                                style="font-size: 1.5rem; letter-spacing: 10px;">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark btn-lg">Verify & Proceed</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3">
+                        <small class="text-muted">Didn't receive code? <a href="#"
+                                class="text-primary">Resend</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

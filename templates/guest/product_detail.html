@@ -1,0 +1,81 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ product.name }} - Atipriya Prints{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}"
+                    class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="row g-0">
+            <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-5">
+                <div
+                    style="width: 100%; height: 400px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    {% if product.image_file %}
+                    <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
+                        class="img-fluid rounded shadow-sm" alt="{{ product.name }}"
+                        style="max-height: 100%; object-fit: contain;"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <i class="fas fa-image text-muted" style="display: none; font-size: 8rem;"></i>
+                    {% else %}
+                    <i class="fas fa-image text-muted" style="font-size: 8rem;"></i>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-body p-5">
+                    <h5 class="text-uppercase text-muted small fw-bold mb-2">Custom Merchandise</h5>
+                    <h1 class="display-5 fw-bold text-dark mb-3">{{ product.name }}</h1>
+
+                    <div class="mb-4">
+                        <span class="display-6 text-primary fw-bold">₹{{ product.base_price }}</span>
+                        <span class="text-muted small ms-2">(Inclusive of all taxes)</span>
+                    </div>
+
+                    <p class="text-muted mb-4">
+                        {{ product.description }}
+                    </p>
+
+                    <p class="text-muted mb-4">
+                        {% if product.sizes %}
+                        <strong>Available Sizes:</strong> {{ product.sizes }}<br>
+                        {% endif %}
+                        {% if product.materials %}
+                        <strong>Specifications:</strong> {{ product.materials }}
+                        {% endif %}
+                    </p>
+
+                    <ul class="list-unstyled text-muted mb-4">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Premium Material Quality
+                        </li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Custom Printing Supported
+                        </li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>24-48 Hour Dispatch</li>
+                    </ul>
+
+                    <hr class="my-4">
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('user_bp.checkout', product_id=product.id) }}"
+                            class="btn btn-dark btn-lg rounded-pill shadow-sm">
+                            <i class="fas fa-shopping-bag me-2"></i> Proceed to Customize & Pay
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted"><i class="fas fa-lock me-1"></i> Secure Checkout via
+                            Scanner/COD</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

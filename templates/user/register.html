@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Register - Atipriya Prints{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 rounded-3">
+
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Create Account</h4>
+            </div>
+
+            <div class="card-body p-4">
+
+                <form method="POST" action="{{ url_for('auth_bp.register') }}">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" name="username" placeholder="e.g. Elon Musk"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-envelope"></i></span>
+                            <input type="email" class="form-control" name="email" placeholder="name@example.com"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" name="password"
+                                placeholder="Create a strong password" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            Register Now
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer text-center py-3 bg-light">
+                <small class="text-muted">Already have an account?
+                    <a href="{{ url_for('auth_bp.login') }}" class="fw-bold text-decoration-none">
+                        Login here
+                    </a>
+                </small>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
