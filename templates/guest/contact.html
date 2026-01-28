@@ -1,0 +1,168 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Contact Us - Atipriya Prints{% endblock %}
+
+{% block content %}
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #f3f4f6;
+    }
+
+    .contact-wrapper {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+    }
+
+    .info-panel {
+        background: #111827;
+        color: white;
+        padding: 3rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .form-panel {
+        padding: 3rem;
+        background: white;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+
+    .form-control,
+    .form-select {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus {
+        background-color: white;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+
+            <div class="contact-wrapper">
+                <div class="row g-0">
+
+                    <div class="col-lg-5">
+                        <div class="info-panel">
+                            <div>
+                                <h3 class="fw-bold mb-4">Get in touch</h3>
+                                <p class="text-white-50 mb-5">
+                                    Have a question about a product, bulk order, or collaboration?
+                                    Fill out the form and our team will respond within 24 hours.
+                                </p>
+
+                                <div class="contact-item">
+                                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                                    <div>
+                                        <div class="small text-white-50">Phone</div>
+                                        <div class="fw-bold">+91 98765 43210</div>
+                                    </div>
+                                </div>
+
+                                <div class="contact-item">
+                                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                                    <div>
+                                        <div class="small text-white-50">Email</div>
+                                        <div class="fw-bold">support@atipriya.com</div>
+                                    </div>
+                                </div>
+
+                                <div class="contact-item">
+                                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                    <div>
+                                        <div class="small text-white-50">Location</div>
+                                        <div class="fw-bold">ICFAI University, Jaipur</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5">
+                                <a href="#" class="text-white me-3 text-decoration-none"><i
+                                        class="fab fa-instagram fa-lg"></i></a>
+                                <a href="#" class="text-white me-3 text-decoration-none"><i
+                                        class="fab fa-twitter fa-lg"></i></a>
+                                <a href="#" class="text-white me-3 text-decoration-none"><i
+                                        class="fab fa-linkedin fa-lg"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="form-panel">
+                            <form method="POST">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted">Your Name</label>
+                                        <input type="text" name="name" class="form-control" placeholder="John Doe"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted">Your Email</label>
+                                        <input type="email" name="email" class="form-control"
+                                            placeholder="name@example.com" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-muted">Subject</label>
+                                        <select class="form-select" name="subject">
+                                            <option>General Inquiry</option>
+                                            <option>Order Status</option>
+                                            <option>Bulk/Corporate Order</option>
+                                            <option>Complaint/Feedback</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-muted">Message</label>
+                                        <textarea name="message" class="form-control" rows="5"
+                                            placeholder="How can we help you?" required></textarea>
+                                    </div>
+                                    <div class="col-12 mt-4">
+                                        <button type="submit" class="btn btn-dark w-100 py-3 fw-bold rounded-3">
+                                            Send Message <i class="fas fa-paper-plane ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

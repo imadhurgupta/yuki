@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Checkout - {{ product.name }}{% endblock %}
+{% block title %}Checkout - Bulk Order{% endblock %}
 
 {% block content %}
 
@@ -10,9 +10,7 @@
     :root {
         --font-main: 'Plus Jakarta Sans', sans-serif;
         --color-accent: #111827;
-        /* Near Black */
         --color-primary: #3b82f6;
-        /* Modern Blue */
         --bg-body: #f3f4f6;
         --border-color: #e5e7eb;
         --card-radius: 16px;
@@ -33,10 +31,6 @@
         font-weight: 700;
     }
 
-    .ls-tight {
-        letter-spacing: -0.02em;
-    }
-
     .text-accent {
         color: var(--color-accent);
     }
@@ -47,7 +41,6 @@
         border-radius: var(--card-radius);
         border: 1px solid white;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-        transition: transform 0.2s, box-shadow 0.2s;
         margin-bottom: 1.5rem;
         overflow: hidden;
     }
@@ -79,7 +72,6 @@
     .form-floating>.form-select {
         border: 1px solid var(--border-color);
         background-color: #f9fafb;
-        /* Subtle grey bg */
         border-radius: 10px;
         font-weight: 500;
         color: var(--color-accent);
@@ -126,7 +118,6 @@
         background: #f9fafb;
     }
 
-    /* Active Payment State */
     .payment-tile.active {
         border: 2px solid var(--color-accent);
         background: #fff;
@@ -135,7 +126,6 @@
 
     .payment-tile.active::after {
         content: '\f00c';
-        /* FontAwesome Check */
         font-family: "Font Awesome 5 Free";
         font-weight: 900;
         position: absolute;
@@ -162,6 +152,25 @@
         border: 1px solid var(--border-color);
     }
 
+    /* --- Scrollable List (FIXED) --- */
+    .cart-items-list {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 10px;
+        /* Added padding-top to prevent top badge from being cut off */
+        padding-top: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .cart-items-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .cart-items-list::-webkit-scrollbar-thumb {
+        background: #e5e7eb;
+        border-radius: 10px;
+    }
+
     .btn-pay {
         background: var(--color-accent);
         color: white;
@@ -180,15 +189,12 @@
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
 
-    /* --- NEW: Green Button Style for COD --- */
     .btn-green {
         background-color: #10b981 !important;
-        /* Emerald Green */
     }
 
     .btn-green:hover {
         background-color: #059669 !important;
-        /* Darker Green */
     }
 </style>
 
@@ -259,14 +265,14 @@
                 <div class="modern-card">
                     <div class="modern-card-header">
                         <div class="step-number">2</div>
-                        <h6 class="mb-0 fw-700 text-accent">Personalization</h6>
+                        <h6 class="mb-0 fw-700 text-accent">Personalization (Bulk)</h6>
                     </div>
                     <div class="p-4">
                         <div class="upload-zone p-4 text-center position-relative mb-3">
                             <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2" id="uploadIcon"></i>
                             <h6 class="fw-600 text-accent mb-1" id="fileName" style="font-size: 0.95rem;">Upload Design
-                                File</h6>
-                            <p class="small text-muted mb-0">Drag & drop or click to browse</p>
+                                File (Optional)</h6>
+                            <p class="small text-muted mb-0">Applied to the entire order</p>
                             <input type="file" name="custom_file" id="fileInput"
                                 class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0"
                                 style="cursor: pointer;">
@@ -275,7 +281,7 @@
                         <div class="form-floating">
                             <textarea name="instructions" class="form-control" placeholder="Comments" id="instructions"
                                 style="height: 100px"></textarea>
-                            <label for="instructions">Special Instructions (Optional)</label>
+                            <label for="instructions">General Instructions (Optional)</label>
                         </div>
                     </div>
                 </div>
@@ -324,62 +330,52 @@
 
             <div class="col-lg-5">
                 <div class="summary-card">
-                    <div class="p-4 border-bottom">
+                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
                         <h5 class="fw-700 mb-0 text-accent ls-tight">Order Summary</h5>
+                        <a href="{{ url_for('user_bp.cart') }}" class="text-decoration-none small fw-bold">Edit Cart</a>
                     </div>
                     <div class="p-4">
-                        <div class="d-flex align-items-center mb-4">
-                            {% if product.image_file %}
-                            <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
-                                class="rounded-3 border" style="width: 80px; height: 80px; object-fit: cover;">
-                            {% endif %}
-                            <div class="ms-3">
-                                <h6 class="fw-700 text-accent mb-1">{{ product.name }}</h6>
-                                <p class="text-muted small mb-0">{{ product.category }}</p>
-                            </div>
-                            <div class="ms-auto fw-700 text-accent">₹{{ product.base_price }}</div>
-                        </div>
 
-                        <div class="row g-2 mb-4">
-                            <div class="col-6">
-                                <div class="form-floating">
-                                    <select name="size" class="form-select fw-600">
-                                        {% for size in product.sizes.split(',') if product.sizes %}
-                                        <option value="{{ size }}">{{ size }}</option>
-                                        {% else %}
-                                        <option value="Std">Std</option>
-                                        {% endfor %}
-                                    </select>
-                                    <label>Size</label>
+                        <div class="cart-items-list">
+                            {% for item in cart %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="position: relative;">
+                                    <img src="{{ url_for('static', filename='uploads/' + item.image) }}"
+                                        class="rounded-3 border" style="width: 60px; height: 60px; object-fit: cover;">
+
+                                    <span
+                                        class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-dark border border-white d-flex align-items-center justify-content-center"
+                                        style="width: 22px; height: 22px; font-size: 0.75rem; padding: 0;">
+                                        {{ item.qty }}
+                                    </span>
+                                </div>
+                                <div class="ms-3 flex-grow-1">
+                                    <h6 class="fw-700 text-accent mb-0 small text-truncate" style="max-width: 140px;">{{
+                                        item.name }}</h6>
+                                    <small class="text-muted" style="font-size: 0.8rem;">Size: {{ item.size }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-700 text-accent small">₹{{ item.price * item.qty }}</div>
+                                    {% if item.shipping > 0 %}
+                                    <small class="text-muted" style="font-size: 0.7rem;">+₹{{ item.shipping }}</small>
+                                    {% endif %}
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="form-floating">
-                                    <select name="quantity" id="qtyInput" class="form-select fw-600"
-                                        onchange="updateTotal()">
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                    </select>
-                                    <label>Qty</label>
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
 
                         <div class="border-top border-bottom py-3 my-3">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Subtotal</span>
-                                <span class="fw-600">₹<span id="subtotalDisplay">{{ product.base_price }}</span></span>
+                                <span class="fw-600">₹{{ subtotal }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">Shipping Charges</span>
+                                <span class="text-muted">Total Shipping</span>
                                 <span class="fw-600 text-dark">
-                                    {% if product.shipping_charge > 0 %}
-                                    ₹{{ product.shipping_charge }}
+                                    {% if shipping > 0 %}
+                                    ₹{{ shipping }}
                                     {% else %}
-                                    Free
+                                    <span class="text-success">Free</span>
                                     {% endif %}
                                 </span>
                             </div>
@@ -387,8 +383,7 @@
 
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <span class="fw-700 h5 mb-0 text-accent">Total</span>
-                            <span class="fw-700 h4 mb-0 text-accent">₹<span id="totalDisplay">{{ product.base_price +
-                                    (product.shipping_charge or 0) }}</span></span>
+                            <span class="fw-700 h4 mb-0 text-accent">₹{{ total }}</span>
                         </div>
 
                         <button type="submit" id="submitBtn" class="btn-pay shadow-sm">
@@ -438,19 +433,6 @@
         tileElement.classList.add('active');
 
         updateButtonText();
-    }
-
-    // Price Calculation
-    function updateTotal() {
-        const basePrice = parseFloat("{{ product.base_price }}");
-        const shipping = parseFloat("{{ product.shipping_charge or 0 }}");
-        const qty = parseInt(document.getElementById('qtyInput').value);
-
-        const subtotal = basePrice * qty;
-        const total = subtotal + shipping;
-
-        document.getElementById('subtotalDisplay').innerText = subtotal.toFixed(1);
-        document.getElementById('totalDisplay').innerText = total.toFixed(1);
     }
 
     // Dynamic Button Text & Color

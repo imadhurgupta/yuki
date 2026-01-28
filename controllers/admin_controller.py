@@ -1,91 +1,149 @@
 import os
-from flask import render_template, redirect, url_for, flash, request, current_app
-from flask_login import current_user
+import uuid
+from flask import render_template, request, redirect, url_for, flash, current_app
+from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from models import db, Product, Order
+from models import db, User, Order, Product, Carousel
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
-
+# --- DASHBOARD ---
+@login_required
 def dashboard():
-    # Sort orders by date (newest first)
-    orders = Order.query.order_by(Order.date_ordered.desc()).all()
-    products = Product.query.all()
-    active_tab = request.args.get('tab', 'orders')
+    if not current_user.is_admin:
+        flash("Access Denied.", "danger")
+        return redirect(url_for('user_bp.home'))
+        
+    # Stats
+    total_orders = Order.query.count()
+    total_products = Product.query.count()
+    pending_orders = Order.query.filter_by(status='Pending').count()
     
-    # FIX: Point to 'user/dashboard.html' since your file is in that folder
-    return render_template('admin/dashboard.html', orders=orders, products=products, active_tab=active_tab)
+    # Data
+    orders = Order.query.order_by(Order.date_ordered.desc()).all()
+    products = Product.query.order_by(Product.id.desc()).all()
+    banners = Carousel.query.all()
+    
+    return render_template('admin/dashboard.html', 
+                           total_orders=total_orders, 
+                           total_products=total_products,
+                           pending_orders=pending_orders,
+                           orders=orders,
+                           products=products,
+                           banners=banners)
 
-def add_product():
+# --- CAROUSEL ACTIONS ---
+@login_required
+def add_banner():
+    if not current_user.is_admin: return redirect(url_for('user_bp.home'))
+    
     if request.method == 'POST':
-        # 1. Get data
+        title = request.form.get('title')
+        subtitle = request.form.get('subtitle')
+        link = request.form.get('link')
+        file = request.files.get('image')
+        
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            unique_name = f"{uuid.uuid4().hex}_{filename}"
+            path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
+            file.save(path)
+            
+            new_banner = Carousel(title=title, subtitle=subtitle, image_file=unique_name, link=link)
+            db.session.add(new_banner)
+            db.session.commit()
+            flash('Banner added.', 'success')
+            
+    return redirect(url_for('admin_bp.dashboard'))
+
+@login_required
+def delete_banner(banner_id):
+    if not current_user.is_admin: return redirect(url_for('user_bp.home'))
+    banner = Carousel.query.get_or_404(banner_id)
+    db.session.delete(banner)
+    db.session.commit()
+    flash('Banner deleted.', 'info')
+    return redirect(url_for('admin_bp.dashboard'))
+
+# --- PRODUCT ACTIONS ---
+@login_required
+def add_product():
+    if not current_user.is_admin: return redirect(url_for('user_bp.home'))
+    
+    if request.method == 'POST':
         name = request.form.get('name')
-        price = request.form.get('price')
+        base_price = float(request.form.get('price'))
+        shipping_charge = float(request.form.get('shipping_charge') or 0)
+        section = request.form.get('section')
         category = request.form.get('category')
         sizes = request.form.get('sizes')
         
-        # 2. Handle Image
-        image = request.files.get('image')
-        filename = None
-        if image:
-            filename = secure_filename(image.filename)
-            image.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-
-        # 3. Create Product (REMOVE 'materials' from here!)
+        file = request.files.get('image')
+        filename = 'default.jpg'
+        
+        if file and file.filename != '':
+            fname = secure_filename(file.filename)
+            unique_name = f"{uuid.uuid4().hex}_{fname}"
+            path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
+            file.save(path)
+            filename = unique_name
+            
         new_product = Product(
-            name=name,
-            base_price=float(price),
-            category=category,
-            sizes=sizes,
-            image_file=filename
-            # materials=...  <-- DELETE THIS LINE if it exists
+            name=name, base_price=base_price, shipping_charge=shipping_charge,
+            section=section, category=category, sizes=sizes, image_file=filename
         )
-
-        try:
-            db.session.add(new_product)
-            db.session.commit()
-            flash('Product added successfully!', 'success')
-        except Exception as e:
-            flash(f'Error: {str(e)}', 'danger')
-            print(e)
-
-        return redirect(url_for('admin_bp.dashboard'))
-    
+        db.session.add(new_product)
+        db.session.commit()
+        flash('Product added.', 'success')
+        
     return redirect(url_for('admin_bp.dashboard'))
 
-def edit_product(product_id):
-    product = Product.query.get_or_404(product_id)
-    try:
-        product.name = request.form.get('name')
-        product.base_price = float(request.form.get('price'))
-        product.description = request.form.get('description')
-        product.sizes = request.form.get('sizes')
-        product.materials = request.form.get('materials')
-        product.category = request.form.get('category') # <--- NEW: Update Category
-        
-        if 'image' in request.files:
-            file = request.files['image']
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-                product.image_file = filename
-        
-        db.session.commit()
-        flash('Product updated!', 'success')
-    except Exception as e:
-        flash(f'Error: {str(e)}', 'danger')
-    return redirect(url_for('admin_bp.dashboard', tab='products'))
-
+@login_required
 def delete_product(product_id):
+    if not current_user.is_admin: return redirect(url_for('user_bp.home'))
     product = Product.query.get_or_404(product_id)
     db.session.delete(product)
     db.session.commit()
-    flash('Product deleted.', 'success')
-    return redirect(url_for('admin_bp.dashboard', tab='products'))
+    flash('Product deleted.', 'info')
+    return redirect(url_for('admin_bp.dashboard'))
 
+# --- NEW: EDIT PRODUCT (Fixes the BuildError) ---
+@login_required
+def edit_product(product_id):
+    if not current_user.is_admin: return redirect(url_for('user_bp.home'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    if request.method == 'POST':
+        product.name = request.form.get('name')
+        product.base_price = float(request.form.get('price'))
+        product.shipping_charge = float(request.form.get('shipping_charge') or 0)
+        product.section = request.form.get('section')
+        product.category = request.form.get('category')
+        product.sizes = request.form.get('sizes')
+        
+        # Handle Image Update
+        file = request.files.get('image')
+        if file and file.filename != '':
+            fname = secure_filename(file.filename)
+            unique_name = f"{uuid.uuid4().hex}_{fname}"
+            path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
+            file.save(path)
+            product.image_file = unique_name
+            
+        db.session.commit()
+        flash('Product updated successfully!', 'success')
+        
+    return redirect(url_for('admin_bp.dashboard'))
+
+# --- NEW: UPDATE ORDER STATUS (Fixes the other dropdown) ---
+@login_required
 def update_order(order_id):
+    if not current_user.is_admin: return redirect(url_for('user_bp.home'))
+    
     order = Order.query.get_or_404(order_id)
-    order.status = request.form.get('status')
-    db.session.commit()
+    if request.method == 'POST':
+        new_status = request.form.get('status')
+        order.status = new_status
+        db.session.commit()
+        flash(f'Order #{order.transaction_id} updated to {new_status}.', 'success')
+        
     return redirect(url_for('admin_bp.dashboard'))

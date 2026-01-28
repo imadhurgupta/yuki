@@ -1,54 +1,31 @@
 from app import app
-from models import db, User, Product
+from models import db, User, Product, Carousel
 
 def create_database():
     with app.app_context():
-        # 1. Wipe everything (Clean Slate)
         db.drop_all()
         db.create_all()
-        print(">> Old tables dropped and new tables created.")
+        print(">> Database refreshed.")
         
-        # 2. Create Admin
-        admin = User(username='admin', email='madhurguptaofficial@gmail.com', is_admin=True)
+        # 1. Admin
+        admin = User(username='Admin', email='madhurguptaofficial@gmail.com', is_admin=True)
         admin.set_password('admin123')
         db.session.add(admin)
-        print(">> Admin account created.")
         
-        # 3. Add Sample Products (This was missing logic before)
-        # Note: 'materials' field is REMOVED to prevent crashes
-        product1 = Product(
-            name="Custom Printed T-Shirt",
-            base_price=499.0,
-            category="T-Shirts",
-            sizes="S, M, L, XL",
-            image_file="default_tshirt.jpg" # Make sure to put a dummy image in static/uploads if possible
-        )
+        # 2. Add Carousel Banners
+        b1 = Carousel(title="Summer Collection 2026", subtitle="Flat 30% Off on Hoodies", image_file="banner1.jpg", link="#")
+        b2 = Carousel(title="Custom Mugs", subtitle="Start your day with a smile", image_file="banner2.jpg", link="#")
+        db.session.add_all([b1, b2])
 
-        product2 = Product(
-            name="Personalized Coffee Mug",
-            base_price=299.0,
-            category="Mugs",
-            sizes="Standard",
-            image_file="default_mug.jpg"
-        )
-
-        product3 = Product(
-            name="Premium Hoodie",
-            base_price=899.0,
-            category="Hoodies",
-            sizes="M, L, XL, XXL",
-            image_file="default_hoodie.jpg"
-        )
-
-        # Add objects to session
-        db.session.add(product1)
-        db.session.add(product2)
-        db.session.add(product3)
+        # 3. Add Products (Section -> Category)
+        p1 = Product(name="Men's Classic Tee", base_price=499, section="Men", category="T-Shirts", image_file="tshirt.jpg")
+        p2 = Product(name="Men's Urban Hoodie", base_price=999, section="Men", category="Hoodies", image_file="hoodie.jpg")
+        p3 = Product(name="Women's Crop Top", base_price=399, section="Women", category="T-Shirts", image_file="crop.jpg")
+        p4 = Product(name="Custom Coffee Mug", base_price=199, section="Accessories", category="Mugs", image_file="mug.jpg")
         
-        # 4. Commit Changes
+        db.session.add_all([p1, p2, p3, p4])
         db.session.commit()
-        print(">> Products added successfully!")
-        print(">> Database initialization complete.")
+        print(">> Data initialized successfully!")
 
 if __name__ == "__main__":
     create_database()

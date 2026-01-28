@@ -1,0 +1,248 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Shopping Bag - Atipriya Prints{% endblock %}
+
+{% block content %}
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+    :root {
+        --font-main: 'Plus Jakarta Sans', sans-serif;
+        --color-accent: #111827;
+        --color-primary: #3b82f6;
+        --bg-body: #f3f4f6;
+        --border-color: #e5e7eb;
+        --card-radius: 16px;
+    }
+
+    body {
+        font-family: var(--font-main);
+        background-color: var(--bg-body);
+        color: #374151;
+    }
+
+    .fw-600 {
+        font-weight: 600;
+    }
+
+    .fw-700 {
+        font-weight: 700;
+    }
+
+    .text-accent {
+        color: var(--color-accent);
+    }
+
+    .modern-card {
+        background: white;
+        border-radius: var(--card-radius);
+        border: 1px solid white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .cart-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .cart-item:hover {
+        background-color: #f9fafb;
+    }
+
+    .item-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-remove {
+        color: #ef4444;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        transition: all 0.2s;
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .btn-remove:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+
+    .btn-checkout {
+        background: var(--color-accent);
+        color: white;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.2s;
+        border: none;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .btn-checkout:hover {
+        background: black;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-continue {
+        border: 2px solid var(--border-color);
+        background: white;
+        color: var(--color-accent);
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-continue:hover {
+        border-color: var(--color-accent);
+        background: white;
+        color: var(--color-accent);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .summary-total {
+        border-top: 1px solid var(--border-color);
+        padding-top: 1rem;
+        margin-top: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="fw-700 text-accent mb-0">Shopping Bag <span class="text-muted fs-4">({{ cart|length }} items)</span>
+        </h2>
+        <a href="{{ url_for('user_bp.home') }}" class="btn-continue d-none d-md-inline-block">
+            <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+        </a>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-8">
+            {% if cart %}
+            <div class="modern-card">
+                {% for item in cart %}
+                <div class="cart-item">
+                    <div class="d-flex gap-4 align-items-start">
+                        <a href="{{ url_for('user_bp.product_detail', product_id=item.id) }}">
+                            <img src="{{ url_for('static', filename='uploads/' + item.image) }}" class="item-image"
+                                alt="{{ item.name }}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'">
+                        </a>
+
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between mb-1">
+                                <h5 class="fw-700 text-accent mb-0">
+                                    <a href="{{ url_for('user_bp.product_detail', product_id=item.id) }}"
+                                        class="text-decoration-none text-accent">
+                                        {{ item.name }}
+                                    </a>
+                                </h5>
+                                <span class="fw-700 text-accent fs-5">₹{{ item.price * item.qty }}</span>
+                            </div>
+
+                            <p class="text-muted small mb-2">Category: General</p>
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">Size: <strong>{{
+                                        item.size }}</strong></span>
+                                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">Qty: <strong>{{
+                                        item.qty }}</strong></span>
+                            </div>
+
+                            <a href="{{ url_for('user_bp.remove_from_cart', index=loop.index0) }}" class="btn-remove">
+                                <i class="fas fa-trash-alt"></i> Remove
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="modern-card p-5 text-center">
+                <div class="mb-4">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                        style="width: 100px; height: 100px;">
+                        <i class="fas fa-shopping-basket fa-3x text-muted opacity-50"></i>
+                    </div>
+                </div>
+                <h4 class="fw-700 text-accent mb-2">Your bag is empty</h4>
+                <p class="text-muted mb-4">Looks like you haven't added anything yet.</p>
+                <a href="{{ url_for('user_bp.home') }}" class="btn-checkout d-inline-block w-auto px-5">
+                    Start Shopping
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if cart %}
+        <div class="col-lg-4">
+            <div class="modern-card p-4 position-sticky" style="top: 20px;">
+                <h5 class="fw-700 text-accent mb-4">Order Summary</h5>
+
+                <div class="summary-row">
+                    <span class="text-muted">Subtotal</span>
+                    <span class="fw-600 text-accent">₹{{ subtotal }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span class="text-muted">Shipping Estimate</span>
+                    <span class="fw-600 {% if shipping == 0 %}text-success{% else %}text-accent{% endif %}">
+                        {% if shipping > 0 %}₹{{ shipping }}{% else %}Free{% endif %}
+                    </span>
+                </div>
+
+                <div class="summary-row">
+                    <span class="text-muted">Tax Estimate</span>
+                    <span class="text-muted small">Included</span>
+                </div>
+
+                <div class="summary-total">
+                    <span class="fw-700 h5 mb-0 text-accent">Order Total</span>
+                    <span class="fw-700 h4 mb-0 text-accent">₹{{ total }}</span>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('user_bp.checkout_cart') }}" class="btn-checkout">
+                        Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                <div class="text-center mt-3 d-flex align-items-center justify-content-center gap-2 text-muted small">
+                    <i class="fas fa-lock"></i> Secure Checkout
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

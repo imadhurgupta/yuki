@@ -75,13 +75,26 @@
                                     <td>
                                         {% if order.status == 'Pending' %}
                                         <span
-                                            class="badge bg-warning text-dark bg-opacity-25 px-3 py-2 rounded-pill">Pending</span>
+                                            class="badge bg-warning text-dark bg-opacity-25 border border-warning">Pending</span>
+
+                                        {% elif order.status == 'Processing' or order.status == 'Paid' %}
+                                        <span
+                                            class="badge bg-info text-dark bg-opacity-25 border border-info">Processing</span>
+
                                         {% elif order.status == 'Shipped' %}
                                         <span
-                                            class="badge bg-info text-dark bg-opacity-25 px-3 py-2 rounded-pill">Shipped</span>
-                                        {% else %}
+                                            class="badge bg-primary text-primary bg-opacity-10 border border-primary">Shipped</span>
+
+                                        {% elif order.status == 'Delivered' or order.status == 'Completed' %}
                                         <span
-                                            class="badge bg-success text-success bg-opacity-10 px-3 py-2 rounded-pill">Completed</span>
+                                            class="badge bg-success text-success bg-opacity-10 border border-success">Completed</span>
+
+                                        {% elif order.status == 'Cancelled' %}
+                                        <span
+                                            class="badge bg-danger text-danger bg-opacity-10 border border-danger">Cancelled</span>
+
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ order.status }}</span>
                                         {% endif %}
                                     </td>
 

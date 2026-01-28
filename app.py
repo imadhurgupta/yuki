@@ -20,9 +20,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'madhurguptaofficial@gmail.com'
-app.config['MAIL_PASSWORD'] = 'zydu tzxg damh gksi'
-app.config['MAIL_DEFAULT_SENDER'] = 'madhurguptaofficial@gmail.com'
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_ADDRESS')
+app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('EMAIL_ADDRESS')
 
 # File Upload Config
 UPLOAD_FOLDER = os.path.join('static', 'uploads')

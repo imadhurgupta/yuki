@@ -17,14 +17,15 @@
                     <a class="nav-link" href="{{ url_for('user_bp.home') }}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('user_bp.home', ref='shop') }}">Shop</a>
+                    <a class="nav-link" href="{{ url_for('user_bp.shop') }}">Shop</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link" href="{{ url_for('user_bp.about') }}">About</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
+                    <a class="nav-link" href="{{ url_for('user_bp.contact') }}">Contact</a>
                 </li>
             </ul>
 
@@ -55,6 +56,11 @@
                         <li>
                             <a class="dropdown-item py-2" href="{{ url_for('user_bp.profile') }}">
                                 <i class="fas fa-user-circle me-2 text-primary"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('user_bp.cart') }}">
+                                <i class="fas fa-shopping-cart me-2 text-primary"></i> My Cart
                             </a>
                         </li>
                         {% endif %}

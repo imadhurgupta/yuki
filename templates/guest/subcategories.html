@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+{% block title %}{{ section }} - Atipriya Prints{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+            <li class="breadcrumb-item active">{{ section }}</li>
+        </ol>
+    </nav>
+
+    <h1 class="fw-bold mb-4">Shop {{ section }}</h1>
+
+    <div class="row g-4">
+        {% for cat in subcats %}
+        <div class="col-md-3">
+            <a href="{{ url_for('user_bp.home', category=cat) }}" class="text-decoration-none">
+                <div class="p-5 bg-white border rounded-4 text-center hover-border shadow-sm">
+                    <i class="fas fa-layer-group fa-3x text-primary mb-3"></i>
+                    <h4 class="fw-bold text-dark">{{ cat }}</h4>
+                    <span class="small text-muted">View Products</span>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<style>
+    .hover-border:hover {
+        border-color: #3b82f6 !important;
+        background-color: #f9fafb;
+    }
+</style>
+{% endblock %}

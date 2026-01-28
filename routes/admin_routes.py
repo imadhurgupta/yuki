@@ -1,29 +1,19 @@
-from flask import Blueprint, redirect, url_for, flash
-from flask_login import current_user
+from flask import Blueprint
 from controllers import admin_controller
 
-# Create Blueprint
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
-# --- SECURITY: Protect all Admin Routes ---
-@admin_bp.before_request
-def restrict_access():
-    # It is safer to check 'is_authenticated' first
-    if not current_user.is_authenticated or not current_user.is_admin:
-        flash('Access Denied. Admins only.', 'danger')
-        return redirect(url_for('user_bp.home'))
+# Dashboard
+admin_bp.add_url_rule('/dashboard', view_func=admin_controller.dashboard, methods=['GET'])
 
-# --- ROUTES MAP ---
+# Carousel
+admin_bp.add_url_rule('/carousel/add', view_func=admin_controller.add_banner, methods=['POST'])
+admin_bp.add_url_rule('/carousel/delete/<int:banner_id>', view_func=admin_controller.delete_banner, methods=['GET'])
 
-# Dashboard (Default is GET, which is correct)
-admin_bp.add_url_rule('/dashboard', view_func=admin_controller.dashboard)
+# Products
+admin_bp.add_url_rule('/products/add', view_func=admin_controller.add_product, methods=['POST'])
+admin_bp.add_url_rule('/products/delete/<int:product_id>', view_func=admin_controller.delete_product, methods=['GET', 'POST'])
 
-# FIX: Add 'GET' so you can VIEW the form, not just submit it
-admin_bp.add_url_rule('/add-product', view_func=admin_controller.add_product, methods=['GET', 'POST'])
-
-# FIX: Add 'GET' here too for editing
-admin_bp.add_url_rule('/product/edit/<int:product_id>', view_func=admin_controller.edit_product, methods=['GET', 'POST'])
-
-# Delete and Update actions are typically POST-only (Security best practice)
-admin_bp.add_url_rule('/product/delete/<int:product_id>', view_func=admin_controller.delete_product, methods=['POST'])
-admin_bp.add_url_rule('/order/<int:order_id>/update', view_func=admin_controller.update_order, methods=['POST'])
+# --- NEW ROUTES TO FIX ERROR ---
+admin_bp.add_url_rule('/products/edit/<int:product_id>', view_func=admin_controller.edit_product, methods=['POST'])
+admin_bp.add_url_rule('/orders/update/<int:order_id>', view_func=admin_controller.update_order, methods=['POST'])

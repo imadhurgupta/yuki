@@ -1,0 +1,116 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Invoice #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <a href="{{ url_for('user_bp.order_detail', order_id=order.id)}}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Orders
+        </a>
+        <button onclick="window.print()" class="btn btn-primary shadow-sm">
+            <i class="fas fa-print me-2"></i>Print Invoice
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-0 p-5" id="invoiceArea">
+
+        <div class="row mb-5 border-bottom pb-4 align-items-center">
+            <div class="col-6">
+                <h2 class="fw-bold text-uppercase text-primary mb-0">Atipriya Prints</h2>
+                <p class="text-muted small">Premium Custom Printing Solutions</p>
+            </div>
+            <div class="col-6 text-end">
+                <h4 class="fw-bold mb-1">INVOICE</h4>
+                <p class="mb-0 text-muted">Order #{{ order.id }}</p>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success mt-2 px-3">
+                    {{ 'PAID' if order.status != 'Pending' else 'PAYMENT PENDING' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-6">
+                <p class="fw-bold text-uppercase text-muted small mb-2">Billed To:</p>
+                <h5 class="fw-bold mb-1">{{ order.full_name }}</h5>
+                <p class="mb-0 text-muted">{{ order.mobile_number }}</p>
+                <p class="text-muted small" style="white-space: pre-wrap;">{{ order.address }}</p>
+            </div>
+            <div class="col-6 text-end">
+                <p class="fw-bold text-uppercase text-muted small mb-2">Order Details:</p>
+                <p class="mb-1"><strong>Date:</strong> {{ order.date_ordered.strftime('%d %b, %Y') }}</p>
+                <p class="mb-1"><strong>Transaction ID:</strong> <span class="font-monospace">{{ order.transaction_id
+                        }}</span></p>
+                <p class="mb-0"><strong>Payment Method:</strong> {{ 'Online' if order.status != 'Pending' else 'COD' }}
+                </p>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered border-light">
+                <thead class="bg-light text-uppercase small fw-bold">
+                    <tr>
+                        <th class="py-3 ps-4">Item Description</th>
+                        <th class="py-3 text-center">Size</th>
+                        <th class="py-3 text-center">Qty</th>
+                        <th class="py-3 text-end pe-4">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="ps-4 py-3">
+                            <span class="fw-bold d-block">{{ order.product.name }}</span>
+                            <small class="text-muted">{{ order.product.category }}</small>
+                        </td>
+                        <td class="text-center py-3">{{ order.size }}</td>
+                        <td class="text-center py-3">{{ order.quantity }}</td>
+                        <td class="text-end pe-4 py-3">₹{{ order.product.base_price }}</td>
+                    </tr>
+                </tbody>
+                <tfoot class="bg-white">
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold py-3">Subtotal</td>
+                        <td class="text-end pe-4 py-3">₹{{ order.total_price }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold border-0 text-success py-2">Grand Total</td>
+                        <td class="text-end pe-4 border-0 fw-bold h4 text-success py-2">₹{{ order.total_price }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="fw-bold mb-1">Thank you for your order!</p>
+            <p class="text-muted small mb-0">For support, contact: support@atipriyaprints.com</p>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #invoiceArea,
+        #invoiceArea * {
+            visibility: visible;
+        }
+
+        #invoiceArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            box-shadow: none !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}

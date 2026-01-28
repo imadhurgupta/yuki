@@ -1,286 +1,152 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Shop - Atipriya Prints{% endblock %}
+{% block title %}Home - Atipriya Prints{% endblock %}
 
 {% block content %}
 
-<header class="position-relative overflow-hidden text-center text-white py-5 mb-5 hero-bg">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
+<div id="heroCarousel" class="carousel slide shadow-lg mb-5" data-bs-ride="carousel">
 
-    <div class="container position-relative z-2 py-5 content-fade-in">
-        <span class="badge bg-white text-primary rounded-pill px-3 py-2 mb-3 shadow-sm text-uppercase tracking-wider">
-            New Collection 2026
-        </span>
-        <h1 class="display-3 fw-bolder mb-3">Bringing Your Vision to Life.</h1>
-        <p class="lead mb-5 opacity-90 fw-light fs-4" style="max-width: 600px; margin: 0 auto;">
-            Premium custom printing on T-Shirts, Hoodies, and Mugs. <br>Designed by you, crafted by us.
-        </p>
-
-        <a href="{{ url_for('user_bp.home') }}#shop-section"
-            class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg hover-lift">
-            Explore Designs <i class="fas fa-arrow-down ms-2"></i>
-        </a>
-    </div>
-</header>
-
-<div class="container pb-5" id="shop-section" style="scroll-margin-top: 100px;">
-
-    <div class="text-center mb-5 mt-4">
-        <h6 class="text-muted text-uppercase small tracking-wider mb-3 fw-bold">Shop by Category</h6>
-
-        <div class="d-flex flex-wrap justify-content-center gap-2">
-            <div class="bg-white shadow-sm p-2 rounded-pill d-inline-flex border">
-                <a href="{{ url_for('user_bp.home') }}#shop-section"
-                    class="btn rounded-pill px-4 fw-bold {% if not current_category %}btn-dark{% else %}btn-light text-muted{% endif %} transition-all">
-                    All
-                </a>
-                {% for cat in categories %}
-                <a href="{{ url_for('user_bp.home', category=cat) }}#shop-section"
-                    class="btn rounded-pill px-4 fw-bold {% if current_category == cat %}btn-primary shadow{% else %}btn-light text-muted{% endif %} transition-all">
-                    {{ cat }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% for product in products.items %}
-        <div class="col">
-            <div class="card h-100 border-0 shadow-hover product-card overflow-hidden rounded-4 bg-white">
-
-                <div class="position-relative bg-light overflow-hidden product-img-wrapper" style="height: 320px;">
-                    {% if product.category %}
-                    <div class="position-absolute top-0 start-0 m-3 z-2">
-                        <span
-                            class="badge bg-dark bg-opacity-75 backdrop-blur text-white px-3 py-2 rounded-pill fw-light">
-                            {{ product.category }}
-                        </span>
-                    </div>
-                    {% endif %}
-
-                    <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}"
-                        class="d-block w-100 h-100 d-flex align-items-center justify-content-center">
-                        {% if product.image_file %}
-                        <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
-                            alt="{{ product.name }}" class="img-fluid product-img transition-transform">
-                        {% else %}
-                        <i class="fas fa-image fa-3x text-muted opacity-25"></i>
-                        {% endif %}
-                    </a>
-
-                    <div class="hover-overlay d-flex align-items-end justify-content-center pb-4">
-                        <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}"
-                            class="btn btn-light rounded-pill px-4 py-2 fw-bold shadow-lg transform-up">
-                            Buy Now <i class="fas fa-cart-plus ms-2 text-primary"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card-body text-center p-4">
-                    <h5 class="fw-bold text-dark mb-1">{{ product.name }}</h5>
-                    <p class="text-primary fw-bolder fs-5 mb-0">₹{{ product.base_price }}</p>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="col-12 py-5 text-center">
-            <div class="py-5 bg-light rounded-4 border border-dashed">
-                <i class="fas fa-ghost fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">Nothing here yet!</h4>
-                <p class="text-muted small">Try a different category.</p>
-                <a href="{{ url_for('user_bp.home') }}#shop-section"
-                    class="btn btn-outline-dark rounded-pill mt-2">Clear Filters</a>
-            </div>
-        </div>
+    <div class="carousel-indicators">
+        {% for banner in banners %}
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ loop.index0 }}"
+            class="{% if loop.first %}active{% endif %}" aria-current="true"></button>
         {% endfor %}
     </div>
 
-    {% if products.pages > 1 %}
-    <nav class="mt-5 d-flex justify-content-center">
-        <ul class="pagination gap-2">
-            <li class="page-item {% if not products.has_prev %}disabled{% endif %}">
-                <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center"
-                    style="width: 45px; height: 45px;"
-                    href="{{ url_for('user_bp.home', page=products.prev_num, category=current_category) }}#shop-section">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-            </li>
+    <div class="carousel-inner rounded-bottom-4">
+        {% if banners %}
+        {% for banner in banners %}
+        <div class="carousel-item {% if loop.first %}active{% endif %}" style="height: 550px;">
+            <img src="{{ url_for('static', filename='uploads/' + banner.image_file) }}" class="d-block w-100 h-100"
+                style="object-fit: cover;"
+                onerror="this.src='https://via.placeholder.com/1500x550/111827/ffffff?text={{ banner.title }}'">
 
-            {% for page_num in products.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=1) %}
-            {% if page_num %}
-            <li class="page-item {% if products.page == page_num %}active{% endif %}">
-                <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center fw-bold"
-                    style="width: 45px; height: 45px;"
-                    href="{{ url_for('user_bp.home', page=page_num, category=current_category) }}#shop-section">
-                    {{ page_num }}
+            <div class="position-absolute top-0 start-0 w-100 h-100"
+                style="background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));"></div>
+
+            <div class="carousel-caption d-none d-md-block pb-5 mb-4">
+                <h1 class="display-3 fw-bolder text-white drop-shadow">{{ banner.title }}</h1>
+                <p class="lead text-white-50 fs-4 mb-4">{{ banner.subtitle }}</p>
+                {% if banner.link %}
+                <a href="{{ banner.link }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold shadow-lg hover-scale">
+                    Explore Collection
                 </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled"><span class="page-link border-0 bg-transparent">...</span></li>
-            {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="carousel-item active" style="height: 500px; background-color: #111827;">
+            <div class="d-flex align-items-center justify-content-center h-100 text-white">
+                <div class="text-center">
+                    <h1>Welcome to Atipriya Prints</h1>
+                    <p>Custom Printing Solutions</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+<div class="bg-light py-5">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <h2 class="fw-bolder text-dark mb-1">New Arrivals</h2>
+                <p class="text-muted mb-0">Freshly printed custom merchandise</p>
+            </div>
+            <a href="{{ url_for('user_bp.shop') }}" class="btn btn-outline-dark rounded-pill px-4 fw-bold">View All</a>
+        </div>
+
+        <div class="row g-4">
+            {% if products %}
+            {% for product in products %}
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm hover-up rounded-4 overflow-hidden">
+                    <div class="position-relative bg-white"
+                        style="height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}" class="w-100 h-100">
+                            <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
+                                class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{ product.name }}"
+                                onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                        </a>
+
+                        {% if product.shipping_charge == 0 %}
+                        <span
+                            class="position-absolute top-0 start-0 m-3 badge bg-success bg-opacity-75 backdrop-blur shadow-sm">Free
+                            Ship</span>
+                        {% endif %}
+
+                        <span
+                            class="position-absolute bottom-0 start-0 m-3 badge bg-dark bg-opacity-50 backdrop-blur shadow-sm">
+                            {{ product.category }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-dark mb-1 text-truncate">
+                            <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}"
+                                class="text-decoration-none text-dark">
+                                {{ product.name }}
+                            </a>
+                        </h5>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="h5 fw-bold text-primary mb-0">₹{{ product.base_price }}</span>
+                            <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}"
+                                class="btn btn-sm btn-dark rounded-pill px-3">
+                                View <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endfor %}
-
-            <li class="page-item {% if not products.has_next %}disabled{% endif %}">
-                <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center"
-                    style="width: 45px; height: 45px;"
-                    href="{{ url_for('user_bp.home', page=products.next_num, category=current_category) }}#shop-section">
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-    {% endif %}
-
+            {% else %}
+            <div class="col-12 text-center text-muted py-5">
+                <i class="fas fa-box-open fa-3x mb-3 opacity-25"></i>
+                <p>No products added by Admin yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 <style>
-    /* 1. Hero Background & Animation */
-    .hero-bg {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        border-radius: 0 0 60px 60px;
-        position: relative;
-        z-index: 1;
+    /* Animation Utilities */
+    .hover-scale {
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* Floating Shapes */
-    .shape {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(80px);
-        z-index: -1;
-        animation: float 10s infinite ease-in-out;
+    .hover-scale:hover {
+        transform: scale(1.05);
     }
 
-    .shape-1 {
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.2);
-        top: -50px;
-        left: -50px;
+    .hover-up {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .shape-2 {
-        width: 400px;
-        height: 400px;
-        background: rgba(255, 255, 255, 0.15);
-        bottom: -100px;
-        right: -100px;
-        animation-delay: 2s;
-    }
-
-    .shape-3 {
-        width: 200px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.3);
-        top: 40%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        animation-delay: 4s;
-    }
-
-    @keyframes float {
-
-        0%,
-        100% {
-            transform: translateY(0px) scale(1);
-        }
-
-        50% {
-            transform: translateY(-20px) scale(1.1);
-        }
-    }
-
-    /* 2. Entrance Animation */
-    .content-fade-in {
-        animation: fadeInUp 1s ease-out forwards;
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* 3. Product Card Interaction */
-    .product-card {
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .product-card:hover {
-        transform: translateY(-10px);
+    .hover-up:hover {
+        transform: translateY(-8px);
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
     }
 
-    .product-img {
-        transition: transform 0.5s ease;
-        max-height: 80%;
-        max-width: 80%;
-        object-fit: contain;
+    .ls-1 {
+        letter-spacing: 1px;
     }
 
-    .product-card:hover .product-img {
-        transform: scale(1.1) rotate(2deg);
+    .drop-shadow {
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
-    /* Hover Overlay Button */
-    .hover-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.05);
-        /* Very slight tint */
-        opacity: 0;
-        transition: all 0.3s ease;
-    }
-
-    .transform-up {
-        transform: translateY(20px);
-        transition: transform 0.3s ease;
-    }
-
-    .product-card:hover .hover-overlay {
-        opacity: 1;
-    }
-
-    .product-card:hover .transform-up {
-        transform: translateY(0);
-    }
-
-    /* 4. Utilities */
     .backdrop-blur {
-        backdrop-filter: blur(10px);
-    }
-
-    .tracking-wider {
-        letter-spacing: 2px;
-    }
-
-    .hover-lift {
-        transition: transform 0.3s ease;
-    }
-
-    .hover-lift:hover {
-        transform: translateY(-3px);
-    }
-
-    /* 5. Pagination Override */
-    .page-link {
-        color: #333;
-        transition: all 0.2s;
-    }
-
-    .page-item.active .page-link {
-        background-color: #333;
-        border-color: #333;
-        color: #fff;
+        backdrop-filter: blur(5px);
     }
 </style>
 
