@@ -5,3 +5,4 @@ Werkzeug
 email-validator
 Flask-Mail
 psycopg2-binary
+python-dotenv
