@@ -15,7 +15,7 @@ app = Flask(__name__)
 # --- Configuration ---
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this for production!
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///atipriya.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Madhurgs23@localhost:5432/atipriya_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Mail Configuration
