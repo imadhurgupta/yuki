@@ -1,12 +1,12 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Invoice #{{ order.id }}{% endblock %}
+{% block title %}Invoice #{{ order.transaction_id }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5 mb-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-        <a href="{{ url_for('user_bp.order_detail', order_id=order.id)}}" class="btn btn-outline-secondary">
+        <a href="{{ url_for('user_bp.profile')}}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-2"></i>Back to Orders
         </a>
         <button onclick="window.print()" class="btn btn-primary shadow-sm">
@@ -23,7 +23,8 @@
             </div>
             <div class="col-6 text-end">
                 <h4 class="fw-bold mb-1">INVOICE</h4>
-                <p class="mb-0 text-muted">Order #{{ order.id }}</p>
+                <p class="mb-0 text-muted">Transaction ID: <span class="font-monospace">{{ order.transaction_id
+                        }}</span></p>
                 <span class="badge bg-success bg-opacity-10 text-success border border-success mt-2 px-3">
                     {{ 'PAID' if order.status != 'Pending' else 'PAYMENT PENDING' }}
                 </span>
@@ -40,10 +41,7 @@
             <div class="col-6 text-end">
                 <p class="fw-bold text-uppercase text-muted small mb-2">Order Details:</p>
                 <p class="mb-1"><strong>Date:</strong> {{ order.date_ordered.strftime('%d %b, %Y') }}</p>
-                <p class="mb-1"><strong>Transaction ID:</strong> <span class="font-monospace">{{ order.transaction_id
-                        }}</span></p>
-                <p class="mb-0"><strong>Payment Method:</strong> {{ 'Online' if order.status != 'Pending' else 'COD' }}
-                </p>
+                <p class="mb-0"><strong>Payment Method:</strong> {{ order.payment_method }}</p>
             </div>
         </div>
 
@@ -58,24 +56,26 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for item in items %}
                     <tr>
                         <td class="ps-4 py-3">
-                            <span class="fw-bold d-block">{{ order.product.name }}</span>
-                            <small class="text-muted">{{ order.product.category }}</small>
+                            {% if item.product %}
+                            <span class="fw-bold d-block">{{ item.product.name }}</span>
+                            <small class="text-muted">{{ item.product.section }} / {{ item.product.category }}</small>
+                            {% else %}
+                            <span class="fw-bold d-block text-danger">Product Deleted</span>
+                            {% endif %}
                         </td>
-                        <td class="text-center py-3">{{ order.size }}</td>
-                        <td class="text-center py-3">{{ order.quantity }}</td>
-                        <td class="text-end pe-4 py-3">₹{{ order.product.base_price }}</td>
+                        <td class="text-center py-3">{{ item.size }}</td>
+                        <td class="text-center py-3">{{ item.quantity }}</td>
+                        <td class="text-end pe-4 py-3">₹{{ "%.2f"|format(item.total_price) }}</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
                 <tfoot class="bg-white">
                     <tr>
-                        <td colspan="3" class="text-end fw-bold py-3">Subtotal</td>
-                        <td class="text-end pe-4 py-3">₹{{ order.total_price }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="text-end fw-bold border-0 text-success py-2">Grand Total</td>
-                        <td class="text-end pe-4 border-0 fw-bold h4 text-success py-2">₹{{ order.total_price }}</td>
+                        <td colspan="3" class="text-end fw-bold py-3">Grand Total</td>
+                        <td class="text-end pe-4 py-3 h5 fw-bold text-success">₹{{ "%.2f"|format(grand_total) }}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -105,6 +105,8 @@
             left: 0;
             top: 0;
             width: 100%;
+            margin: 0;
+            padding: 0;
             box-shadow: none !important;
         }
 

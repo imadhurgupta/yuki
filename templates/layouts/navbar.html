@@ -48,19 +48,19 @@
                         {% if current_user.is_admin %}
                         <li>
                             <a class="dropdown-item py-2" href="{{ url_for('admin_bp.dashboard') }}">
-                                <i class="fas fa-tachometer-alt me-2 text-primary"></i> Dashboard
+                                <i class="fas fa-tachometer-alt me-2 text-black"></i> Dashboard
                             </a>
                         </li>
 
                         {% else %}
                         <li>
                             <a class="dropdown-item py-2" href="{{ url_for('user_bp.profile') }}">
-                                <i class="fas fa-user-circle me-2 text-primary"></i> My Profile
+                                <i class="fas fa-user-circle me-2 text-black"></i> My Profile
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item py-2" href="{{ url_for('user_bp.cart') }}">
-                                <i class="fas fa-shopping-cart me-2 text-primary"></i> My Cart
+                                <i class="fas fa-shopping-cart me-2 text-black"></i> My Cart
                             </a>
                         </li>
                         {% endif %}
@@ -104,9 +104,10 @@
         color: #0d6efd !important;
     }
 
+    /* Fixed CSS Error Here */
     .dropdown-item:active {
-        background-color: #0d6efd;
         color: white !important;
+        background-color: #0d6efd !important;
     }
 
     .dropdown-item:active i {

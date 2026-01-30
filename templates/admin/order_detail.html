@@ -1,0 +1,143 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Order #{{ order.transaction_id }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <a href="{{ url_for('admin_bp.dashboard') }}" class="btn btn-outline-dark rounded-pill px-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-success rounded-pill px-4">
+                <i class="fas fa-print me-2"></i>Print Receipt
+            </button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-0 p-5 bg-white" id="invoice">
+
+        <div class="row mb-5 border-bottom pb-4">
+            <div class="col-6">
+                <h3 class="fw-bold text-uppercase letter-spacing-2 mb-1">Atipriya Prints</h3>
+                <p class="text-muted small">Custom Printing Solutions</p>
+            </div>
+            <div class="col-6 text-end">
+                <h4 class="fw-bold text-primary mb-1">INVOICE</h4>
+                <p class="text-muted mb-0">#{{ order.transaction_id }}</p>
+                <p class="small text-muted mb-0">Date: {{ order.date_ordered.strftime('%d %b, %Y') }}</p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <h6 class="text-uppercase text-muted fw-bold small mb-3">Bill To:</h6>
+                <h5 class="fw-bold text-dark">{{ order.full_name }}</h5>
+                <p class="text-muted mb-1">{{ order.address }}</p>
+                <p class="text-muted mb-1"><i class="fas fa-phone me-2 small"></i>{{ order.mobile_number }}</p>
+                <p class="text-muted"><i class="fas fa-envelope me-2 small"></i>{{ order.email }}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <h6 class="text-uppercase text-muted fw-bold small mb-3">Order Status:</h6>
+                <span class="badge rounded-pill px-3 py-2 fs-6 mb-2
+                    {% if order.status == 'Delivered' %}bg-success
+                    {% elif order.status == 'Shipped' %}bg-info text-dark
+                    {% else %}bg-warning text-dark{% endif %}">
+                    {{ order.status }}
+                </span>
+                <p class="text-muted mt-2">Payment Method: <span class="fw-bold text-dark">{{ order.payment_method
+                        }}</span></p>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-borderless align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="py-3 ps-4">Item Description</th>
+                        <th class="py-3 text-center">Size</th>
+                        <th class="py-3 text-center">Qty</th>
+                        <th class="py-3 text-end pe-4">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-bottom">
+                        <td class="py-4 ps-4">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='uploads/' + order.product.image_file) }}"
+                                    class="rounded border me-3 d-print-none" width="50" height="50"
+                                    style="object-fit: cover;">
+                                <div>
+                                    <div class="fw-bold">{{ order.product.name }}</div>
+                                    <div class="small text-muted">{{ order.product.section }} > {{
+                                        order.product.category }}</div>
+                                    {% if order.instructions %}
+                                    <div class="small text-danger mt-1 fst-italic">Note: {{ order.instructions }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">{{ order.size }}</td>
+                        <td class="text-center">{{ order.quantity }}</td>
+                        <td class="text-end fw-bold pe-4">₹{{ order.total_price }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row justify-content-end">
+            <div class="col-md-4">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <td class="text-muted">Subtotal</td>
+                        <td class="text-end">₹{{ order.product.base_price * order.quantity }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Shipping</td>
+                        <td class="text-end">₹{{ order.product.shipping_charge }}</td>
+                    </tr>
+                    <tr class="border-top">
+                        <td class="pt-3 fw-bold fs-5">Total</td>
+                        <td class="pt-3 fw-bold fs-5 text-end text-primary">₹{{ order.total_price }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-top text-center text-muted small">
+            <p class="mb-1">Thank you for shopping with Atipriya Prints!</p>
+            <p>For support, contact us at: support@atipriyaprints.com</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Print Styles */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #invoice,
+        #invoice * {
+            visibility: visible;
+        }
+
+        #invoice {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 20px !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}

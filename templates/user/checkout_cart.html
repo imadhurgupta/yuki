@@ -340,24 +340,26 @@
                             {% for item in cart %}
                             <div class="d-flex align-items-center mb-3">
                                 <div style="position: relative;">
-                                    <img src="{{ url_for('static', filename='uploads/' + item.image) }}"
+                                    <img src="{{ url_for('static', filename='uploads/' + item.product.image_file) }}"
                                         class="rounded-3 border" style="width: 60px; height: 60px; object-fit: cover;">
 
                                     <span
                                         class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-dark border border-white d-flex align-items-center justify-content-center"
                                         style="width: 22px; height: 22px; font-size: 0.75rem; padding: 0;">
-                                        {{ item.qty }}
+                                        {{ item.quantity }}
                                     </span>
                                 </div>
                                 <div class="ms-3 flex-grow-1">
                                     <h6 class="fw-700 text-accent mb-0 small text-truncate" style="max-width: 140px;">{{
-                                        item.name }}</h6>
+                                        item.product.name }}</h6>
                                     <small class="text-muted" style="font-size: 0.8rem;">Size: {{ item.size }}</small>
                                 </div>
                                 <div class="text-end">
-                                    <div class="fw-700 text-accent small">₹{{ item.price * item.qty }}</div>
-                                    {% if item.shipping > 0 %}
-                                    <small class="text-muted" style="font-size: 0.7rem;">+₹{{ item.shipping }}</small>
+                                    <div class="fw-700 text-accent small">₹{{ item.product.base_price * item.quantity }}
+                                    </div>
+                                    {% if item.product.shipping_charge > 0 %}
+                                    <small class="text-muted" style="font-size: 0.7rem;">+₹{{
+                                        item.product.shipping_charge }}</small>
                                     {% endif %}
                                 </div>
                             </div>

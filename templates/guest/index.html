@@ -5,7 +5,6 @@
 {% block content %}
 
 <div id="heroCarousel" class="carousel slide shadow-lg mb-5" data-bs-ride="carousel">
-
     <div class="carousel-indicators">
         {% for banner in banners %}
         <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ loop.index0 }}"
@@ -22,7 +21,7 @@
                 onerror="this.src='https://via.placeholder.com/1500x550/111827/ffffff?text={{ banner.title }}'">
 
             <div class="position-absolute top-0 start-0 w-100 h-100"
-                style="background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));"></div>
+                style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5));"></div>
 
             <div class="carousel-caption d-none d-md-block pb-5 mb-4">
                 <h1 class="display-3 fw-bolder text-white drop-shadow">{{ banner.title }}</h1>
@@ -53,6 +52,60 @@
     <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
     </button>
+</div>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h6 class="text-primary fw-bold text-uppercase ls-1">Our Collections</h6>
+        <h2 class="fw-bolder text-dark display-6">Shop by Product</h2>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        {% for section in sections %}
+        <div class="col-md-4 col-lg-3">
+            <a href="{{ url_for('user_bp.shop', section=section) }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm hover-up overflow-hidden rounded-4 text-white text-center h-100">
+
+                    <div style="height: 220px; 
+                         background: linear-gradient(135deg, 
+                         {% if loop.index0 % 4 == 0 %}#6366f1, #a855f7
+                         {% elif loop.index0 % 4 == 1 %}#ec4899, #8b5cf6
+                         {% elif loop.index0 % 4 == 2 %}#3b82f6, #14b8a6
+                         {% else %}#f59e0b, #ef4444{% endif %});"
+                        class="d-flex align-items-center justify-content-center p-3 relative-container">
+
+                        <div class="z-2">
+                            {% if 'Shirt' in section or 'T-Shirt' in section %}
+                            <i class="fas fa-tshirt fa-4x mb-3 text-white opacity-75"></i>
+                            {% elif 'Hoodie' in section %}
+                            <i class="fas fa-user-astronaut fa-4x mb-3 text-white opacity-75"></i>
+                            {% elif 'Mug' in section or 'Cup' in section %}
+                            <i class="fas fa-mug-hot fa-4x mb-3 text-white opacity-75"></i>
+                            {% elif 'Card' in section %}
+                            <i class="fas fa-id-card fa-4x mb-3 text-white opacity-75"></i>
+                            {% elif 'Bottle' in section %}
+                            <i class="fas fa-wine-bottle fa-4x mb-3 text-white opacity-75"></i>
+                            {% elif 'Pillow' in section %}
+                            <i class="fas fa-couch fa-4x mb-3 text-white opacity-75"></i>
+                            {% else %}
+                            <i class="fas fa-box-open fa-4x mb-3 text-white opacity-75"></i>
+                            {% endif %}
+
+                            <h3 class="fw-bold mb-0 text-white">{{ section }}</h3>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white text-dark py-3 border-0">
+                        <span class="fw-bold text-uppercase small ls-1">Browse {{ section }}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-muted">
+            <p>No categories found. Add products in Admin Dashboard to see categories here.</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
 <div class="bg-light py-5">

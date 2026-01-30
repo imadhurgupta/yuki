@@ -9,6 +9,8 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}"
                     class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user_bp.shop') }}"
+                    class="text-decoration-none text-muted">Shop</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
         </ol>
     </nav>
@@ -16,22 +18,36 @@
     <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
         <div class="row g-0">
 
-            <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-5 position-relative">
-                <div
-                    style="width: 100%; height: 400px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <div class="col-md-6 bg-light p-4 d-flex flex-column align-items-center justify-content-center">
+
+                <div class="mb-4 bg-white rounded-4 shadow-sm d-flex align-items-center justify-content-center overflow-hidden"
+                    style="width: 100%; height: 450px;">
                     {% if product.image_file %}
-                    <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
-                        class="img-fluid rounded shadow-sm hover-scale" alt="{{ product.name }}"
-                        style="max-height: 100%; object-fit: contain; transition: transform 0.3s ease;">
+                    <img id="mainImage" src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
+                        class="img-fluid hover-zoom" alt="{{ product.name }}"
+                        style="max-height: 100%; max-width: 100%; object-fit: contain;">
                     {% else %}
                     <i class="fas fa-image text-muted" style="font-size: 8rem; opacity: 0.2;"></i>
                     {% endif %}
+                </div>
+
+                <div class="d-flex gap-2 overflow-auto w-100 justify-content-center pb-2">
+                    <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
+                        onclick="changeImage(this.src)" class="rounded-3 border cursor-pointer hover-scale shadow-sm"
+                        style="width: 70px; height: 70px; object-fit: cover; cursor: pointer;">
+
+                    {% for img in product.images %}
+                    <img src="{{ url_for('static', filename='uploads/' + img.image_file) }}"
+                        onclick="changeImage(this.src)" class="rounded-3 border cursor-pointer hover-scale shadow-sm"
+                        style="width: 70px; height: 70px; object-fit: cover; cursor: pointer;">
+                    {% endfor %}
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="card-body p-5">
-                    <h5 class="text-uppercase text-primary small fw-bold mb-2 ls-1">Custom Merchandise</h5>
+                    <h5 class="text-uppercase text-primary small fw-bold mb-2 ls-1">{{ product.section }} / {{
+                        product.category }}</h5>
                     <h1 class="display-5 fw-bold text-dark mb-3">{{ product.name }}</h1>
 
                     <div class="mb-4">
@@ -40,7 +56,8 @@
                     </div>
 
                     <p class="text-muted mb-4" style="line-height: 1.6;">
-                        {{ product.description }}
+                        {{ product.description or "Elevate your style with our premium custom prints. Designed for
+                        comfort and durability, this is the perfect addition to your collection." }}
                     </p>
 
                     <ul class="list-unstyled text-muted mb-4 small">
@@ -101,19 +118,42 @@
     </div>
 </div>
 
+<script>
+    function changeImage(src) {
+        // Find the main image by ID and update its source
+        document.getElementById('mainImage').src = src;
+    }
+</script>
+
 <style>
     .ls-1 {
         letter-spacing: 1px;
     }
 
+    /* Thumbnail Hover Effect */
     .hover-scale:hover {
-        transform: translateY(-3px);
+        transform: scale(1.05);
+        border-color: #000 !important;
+        transition: all 0.2s ease;
+    }
+
+    /* Main Image Zoom Effect */
+    .hover-zoom {
+        transition: transform 0.3s ease;
+    }
+
+    .hover-zoom:hover {
+        transform: scale(1.02);
     }
 
     .hover-fill:hover {
         background-color: #212529;
         color: white;
         border-color: #212529;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
     }
 </style>
 {% endblock %}

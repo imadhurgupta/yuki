@@ -1,8 +1,9 @@
 import os
 from flask import Flask
 from flask_login import LoginManager
-from models import db, User
-from flask_mail import Mail, Message
+from models import db, User, mail
+from flask_mail import Message
+# import psycopg2 (Handled by SQLAlchemy)
 
 # Import Blueprints from the routes folder
 from routes.user_routes import user_bp
@@ -13,7 +14,8 @@ app = Flask(__name__)
 
 # --- Configuration ---
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this for production!
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///atipriya.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///atipriya.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Madhurgs23@localhost:5432/atipriya_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Mail Configuration
@@ -34,12 +36,13 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # --- Initialize Extensions ---
 db.init_app(app)
+mail.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'auth_bp.login'  # Redirects here if user isn't logged in
 login_manager.login_message_category = 'info'
 
 # Initialize Mail
-mail = Mail(app)
+# mail = Mail(app) # Moved to models.py and init above
 
 # --- User Loader (Required for Flask-Login) ---
 @login_manager.user_loader
