@@ -10,8 +10,8 @@ auth_bp.add_url_rule('/logout', view_func=auth_controller.logout)
 auth_bp.add_url_rule('/verify-otp/<action>', view_func=auth_controller.verify_otp, methods=['GET', 'POST'])
 
 # Google OAuth Routes
-auth_bp.add_url_rule('/google/login', view_func=auth_controller.google_login)
-auth_bp.add_url_rule('/google/callback', view_func=auth_controller.google_callback)
+auth_bp.add_url_rule('/login/google/login/', view_func=auth_controller.google_login)
+auth_bp.add_url_rule('/login/google/callback/', view_func=auth_controller.google_callback)
 # In routes/auth_routes.py
 
 # ... existing routes ...
