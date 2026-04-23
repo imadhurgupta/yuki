@@ -16,7 +16,7 @@ load_dotenv()
 client_id = os.environ.get('GOOGLE_CLIENT_ID', '')
 print(f">> STARTUP: Client ID: {client_id[:15]}...")
 
-app = Flask(__name__)
+app = Flask(__name__, instance_path='/tmp/instance' if os.environ.get('VERCEL') else None)
 
 # --- 1. CONFIGURATION ---
 # Security
@@ -26,8 +26,15 @@ app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
 # Database Config
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_url = os.environ.get('DATABASE_URL')
+
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+# FORCE absolute path for SQLite to prevent Flask-SQLAlchemy from creating an instance folder
+if db_url and db_url.startswith("sqlite:///") and not db_url.startswith("sqlite:////"):
+    db_filename = db_url.split("sqlite:///")[-1]
+    db_url = 'sqlite:///' + os.path.join(basedir, db_filename)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///' + os.path.join(basedir, 'yuki.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         
