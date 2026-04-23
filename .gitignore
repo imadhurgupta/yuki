@@ -151,3 +151,6 @@ dmypy.json
 *.pem
 credentials.json
 client_secret.json
+
+
+scripts/
