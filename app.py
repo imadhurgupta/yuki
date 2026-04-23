@@ -91,6 +91,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 # --- 5. LOCAL DEVELOPMENT ENTRY POINT ---
 # This block is ignored by Gunicorn. It only runs if you type `python app.py`
 if __name__ == '__main__':
+    # Fix for OAuth over HTTP on localhost
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    
     print(f">> Starting in Development Mode using: {app.config['SQLALCHEMY_DATABASE_URI']}")
     with app.app_context():
         try:
