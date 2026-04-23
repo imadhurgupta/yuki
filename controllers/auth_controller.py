@@ -299,9 +299,13 @@ def google_login():
     return oauth.google.authorize_redirect(redirect_uri)
 
 def google_callback():
-    """Handle Google callback."""
-    token = oauth.google.authorize_access_token()
-    user_info = token.get('userinfo')
+    try:
+        token = oauth.google.authorize_access_token()
+        user_info = token.get('userinfo')
+    except Exception as e:
+        print(f"OAuth Error: {e}")
+        flash('Authentication failed or session expired. Please try again.', 'danger')
+        return redirect(url_for('auth_bp.login'))
     
     if not user_info:
         flash('Failed to fetch user info from Google.', 'danger')
@@ -321,13 +325,23 @@ def google_callback():
             is_admin=(email == admin_email)
         )
         db.session.add(user)
-        db.session.commit()
-        flash('Account created via Google!', 'success')
+        try:
+            db.session.commit()
+            flash('Account created via Google!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            print(f"Database write error: {e}")
+            flash('Error: Could not save account because the database is read-only on Vercel. Please configure a PostgreSQL database for production.', 'danger')
+            # Fake the user id so they can at least look around
+            user.id = random.randint(1000, 9999) 
     else:
         # If user exists, ensure admin status is correct if they are the admin
         if email == admin_email and not user.is_admin:
             user.is_admin = True
-            db.session.commit()
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
     
     login_user(user)
     flash(f'Welcome back, {user.full_name}!', 'success')
