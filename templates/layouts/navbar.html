@@ -1,18 +1,72 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
-    <div class="container">
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container d-flex align-items-center justify-content-between">
 
-        <a class="navbar-brand fw-bold text-uppercase letter-spacing-2" href="{{ url_for('user_bp.home') }}"
-            style="font-size: 1.5rem; color: #333;">
-            Atipriya Prints
+        <a class="navbar-brand m-0" href="{{ url_for('user_bp.home') }}">
+            <div class="brand-logo-premium">
+                <div class="brand-icon-box">
+                    <i class="fas fa-snowflake"></i>
+                </div>
+                <span>Yuki</span>
+            </div>
         </a>
 
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <!-- Mobile Toggler & Icons (Right aligned on mobile) -->
+        <div class="d-flex align-items-center d-lg-none gap-2 m-0 p-0">
+            {% if current_user.is_authenticated and not current_user.is_admin %}
+            <a href="{{ url_for('user_bp.cart') }}"
+                class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center position-relative"
+                style="width: 40px; height: 40px; padding: 0;">
+                <i class="fas fa-shopping-cart text-dark"></i>
+                {% if current_user.cart_items %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    style="font-size: 0.65rem;">
+                    {{ current_user.cart_items|length }}
+                </span>
+                {% endif %}
+            </a>
+            {% endif %}
+            <button
+                class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center border-0"
+                type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                style="width: 40px; height: 40px; padding: 0; outline: none;">
+                <i class="fas fa-bars text-dark" style="font-size: 1.1rem;"></i>
+            </button>
+        </div>
 
-        <div class="collapse navbar-collapse" id="navbarContent">
+        {% if request.endpoint in ['user_bp.home', 'user_bp.shop'] %}
+        <!-- SEARCH BAR FOR MOBILE (Directly visible below brand) -->
+        <div class="w-100 d-lg-none mt-3">
+            <form class="d-flex" action="{{ url_for('user_bp.shop') }}" method="GET">
+                <div class="input-group border rounded-pill overflow-hidden shadow-sm" style="background: white;">
+                    <input class="form-control border-0 shadow-none px-3 pt-2 pb-2" type="search"
+                        placeholder="Search products..." aria-label="Search" name="search"
+                        value="{{ request.args.get('search', '') }}" style="font-size: 0.9rem;">
+                    <button class="btn btn-white border-0 text-primary px-3" type="submit" style="background: white;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
 
-            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 fw-bold text-uppercase small gap-3">
+        <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarContent">
+
+            <!-- SEARCH BAR FOR DESKTOP -->
+            <form class="d-none d-lg-flex ms-lg-2 ms-xl-4" action="{{ url_for('user_bp.shop') }}" method="GET"
+                style="min-width: 200px; max-width: 280px; width: 100%;">
+                <div class="input-group border rounded-pill overflow-hidden shadow-sm w-100" style="background: white;">
+                    <input class="form-control border-0 shadow-none px-3 pt-2 pb-2" type="search"
+                        placeholder="Search products..." aria-label="Search" name="search"
+                        value="{{ request.args.get('search', '') }}" style="font-size: 0.9rem;">
+                    <button class="btn btn-white border-0 text-primary px-3" type="submit" style="background: white;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <ul
+                class="navbar-nav mx-auto mb-2 mb-lg-0 fw-bold text-uppercase small gap-2 gap-xl-4 align-items-lg-center">
+
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('user_bp.home') }}">Home</a>
                 </li>
@@ -27,90 +81,78 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('user_bp.contact') }}">Contact</a>
                 </li>
+
             </ul>
 
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-3 mt-3 mt-lg-0">
 
                 {% if current_user.is_authenticated %}
 
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=0D6EFD&color=fff&size=32"
-                            class="rounded-circle me-2 border border-2 border-primary" width="32" height="32"
-                            alt="Avatar">
-                        <span class="fw-bold text-dark d-none d-lg-inline">{{ current_user.username }}</span>
-                    </a>
-
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2"
-                        aria-labelledby="userDropdown">
-
-                        {% if current_user.is_admin %}
-                        <li>
-                            <a class="dropdown-item py-2" href="{{ url_for('admin_bp.dashboard') }}">
-                                <i class="fas fa-tachometer-alt me-2 text-black"></i> Dashboard
-                            </a>
-                        </li>
-
-                        {% else %}
-                        <li>
-                            <a class="dropdown-item py-2" href="{{ url_for('user_bp.profile') }}">
-                                <i class="fas fa-user-circle me-2 text-black"></i> My Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2" href="{{ url_for('user_bp.cart') }}">
-                                <i class="fas fa-shopping-cart me-2 text-black"></i> My Cart
-                            </a>
-                        </li>
+                <div class="d-flex align-items-center gap-2 w-100">
+                    {% if not current_user.is_admin %}
+                    <a href="{{ url_for('user_bp.cart') }}"
+                        class="btn btn-light rounded-circle shadow-sm d-none d-lg-flex align-items-center justify-content-center me-2 position-relative"
+                        style="width: 40px; height: 40px;">
+                        <i class="fas fa-shopping-cart text-dark"></i>
+                        {% if current_user.cart_items %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.65rem; margin-left: -5px;">
+                            {{ current_user.cart_items|length }}
+                        </span>
                         {% endif %}
+                    </a>
+                    {% endif %}
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 text-danger" href="{{ url_for('auth_bp.logout') }}">
-                                <i class="fas fa-sign-out-alt me-2"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                            id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
+                            <img src="https://ui-avatars.com/api/?name={{ current_user.full_name }}&background=0D6EFD&color=fff&size=32"
+                                class="rounded-circle me-2 border border-2 border-primary" width="32" height="32"
+                                alt="Avatar">
+
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-lg-end shadow border-0 rounded-3 mt-2"
+                            aria-labelledby="userDropdown">
+
+                            {% if current_user.is_admin %}
+                            <li>
+                                <a class="dropdown-item py-2" href="{{ url_for('admin_bp.dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-2 text-black"></i> Dashboard
+                                </a>
+                            </li>
+
+                            {% else %}
+                            <li>
+                                <a class="dropdown-item py-2" href="{{ url_for('user_bp.profile') }}">
+                                    <i class="fas fa-user-circle me-2 text-black"></i> My Profile
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 text-danger" href="{{ url_for('auth_bp.logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 {% else %}
-
-                <a href="{{ url_for('auth_bp.login') }}"
-                    class="btn btn-outline-primary rounded-pill px-4 fw-bold">Login</a>
-                <a href="{{ url_for('auth_bp.register') }}"
-                    class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm">Register</a>
-
+                <div class="d-flex w-100 w-lg-auto gap-2">
+                    <a href="{{ url_for('auth_bp.login') }}"
+                        class="btn btn-outline-primary rounded-pill px-3 px-xl-4 fw-bold flex-grow-1">Login</a>
+                    <a href="{{ url_for('auth_bp.register') }}"
+                        class="btn btn-dark rounded-pill px-3 px-xl-4 fw-bold shadow-sm flex-grow-1">Register</a>
+                </div>
                 {% endif %}
 
             </div>
         </div>
     </div>
 </nav>
-
-<style>
-    .letter-spacing-2 {
-        letter-spacing: 2px;
-    }
-
-    .nav-link {
-        color: #555 !important;
-        transition: color 0.3s ease;
-    }
-
-    .nav-link:hover {
-        color: #0d6efd !important;
-    }
-
-    /* Fixed CSS Error Here */
-    .dropdown-item:active {
-        color: white !important;
-        background-color: #0d6efd !important;
-    }
-
-    .dropdown-item:active i {
-        color: white !important;
-    }
-</style>

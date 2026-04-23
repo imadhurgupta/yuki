@@ -1,80 +1,100 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Home - Atipriya Prints{% endblock %}
+{% block title %}Home - Yuki{% endblock %}
 
 {% block content %}
 
-<div id="heroCarousel" class="carousel slide shadow-lg mb-5" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        {% for banner in banners %}
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ loop.index0 }}"
-            class="{% if loop.first %}active{% endif %}" aria-current="true"></button>
-        {% endfor %}
-    </div>
+<div class="container mt-3 overflow-hidden px-2 px-md-0">
+    <div id="heroCarousel" class="carousel slide carousel-fade hero-carousel-wrap" data-bs-ride="carousel"
+        data-bs-interval="2000" data-bs-pause="false">
 
-    <div class="carousel-inner rounded-bottom-4">
-        {% if banners %}
-        {% for banner in banners %}
-        <div class="carousel-item {% if loop.first %}active{% endif %}" style="height: 550px;">
-            <img src="{{ url_for('static', filename='uploads/' + banner.image_file) }}" class="d-block w-100 h-100"
-                style="object-fit: cover;"
-                onerror="this.src='https://via.placeholder.com/1500x550/111827/ffffff?text={{ banner.title }}'">
-
-            <div class="position-absolute top-0 start-0 w-100 h-100"
-                style="background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5));"></div>
-
-            <div class="carousel-caption d-none d-md-block pb-5 mb-4">
-                <h1 class="display-3 fw-bolder text-white drop-shadow">{{ banner.title }}</h1>
-                <p class="lead text-white-50 fs-4 mb-4">{{ banner.subtitle }}</p>
-                {% if banner.link %}
-                <a href="{{ banner.link }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold shadow-lg hover-scale">
-                    Explore Collection
-                </a>
-                {% endif %}
-            </div>
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            {% for banner in banners %}
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ loop.index0 }}"
+                class="{% if loop.first %}active{% endif %}" aria-current="true"></button>
+            {% endfor %}
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="carousel-item active" style="height: 500px; background-color: #111827;">
-            <div class="d-flex align-items-center justify-content-center h-100 text-white">
-                <div class="text-center">
-                    <h1>Welcome to Atipriya Prints</h1>
-                    <p>Custom Printing Solutions</p>
+
+        <div class="carousel-inner">
+            {% if banners %}
+            {% for banner in banners %}
+            <div class="carousel-item {% if loop.first %}active{% endif %} hero-carousel-item">
+
+                <div class="hero-image-wrapper">
+                    <img src="{{ url_for('static', filename='images/' + banner.image_file) }}"
+                        class="hero-carousel-img" alt="{{ banner.title }}"
+                        onerror="this.src='https://via.placeholder.com/1920x700/1e293b/ffffff?text={{ banner.title }}'">
+                    <div class="hero-overlay"></div>
+                </div>
+
+                {% if banner.title or banner.subtitle or banner.link %}
+                <div class="hero-caption">
+                    <div class="hero-caption-inner">
+                        {% if banner.title %}<h1 class="hero-title">{{ banner.title }}</h1>{% endif %}
+                        {% if banner.subtitle %}<p class="hero-subtitle">{{ banner.subtitle }}</p>{% endif %}
+                        {% if banner.link %}
+                        <a href="{{ banner.link }}" class="hero-cta btn-ripple">
+                            Explore Collection <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="carousel-item active hero-carousel-item hero-fallback">
+                <div class="hero-image-wrapper">
+                    <div class="hero-overlay"></div>
+                </div>
+                <div class="hero-caption">
+                    <div class="hero-caption-inner">
+                        <h1 class="hero-title">Welcome to Yuki</h1>
+                        <p class="hero-subtitle">Premium Custom Printing Solutions</p>
+                        <a href="{{ url_for('user_bp.shop') }}" class="hero-cta btn-ripple">
+                            Shop Now <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
+
     </div>
 
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    </button>
 </div>
+</div> <!-- /container -->
 
-<div class="container py-5">
-    <div class="text-center mb-5">
+<div class="container py-4 py-md-5">
+    <div class="text-center mb-4 mb-md-5 reveal">
         <h6 class="text-primary fw-bold text-uppercase ls-1">Our Collections</h6>
         <h2 class="fw-bolder text-dark display-6">Shop by Product</h2>
     </div>
 
     <div class="row g-4 justify-content-center">
         {% for section in sections %}
-        <div class="col-md-4 col-lg-3">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 reveal stagger-{{ (loop.index0 % 6) + 1 }}">
             <a href="{{ url_for('user_bp.shop', section=section) }}" class="text-decoration-none">
                 <div class="card border-0 shadow-sm hover-up overflow-hidden rounded-4 text-white text-center h-100">
 
-                    <div style="height: 220px; 
+                    <div class="d-flex align-items-center justify-content-center p-3 position-relative overflow-hidden"
+                        style="aspect-ratio: 4/3; max-height: 220px; 
                          background: linear-gradient(135deg, 
                          {% if loop.index0 % 4 == 0 %}#6366f1, #a855f7
                          {% elif loop.index0 % 4 == 1 %}#ec4899, #8b5cf6
                          {% elif loop.index0 % 4 == 2 %}#3b82f6, #14b8a6
-                         {% else %}#f59e0b, #ef4444{% endif %});"
-                        class="d-flex align-items-center justify-content-center p-3 relative-container">
+                         {% else %}#f59e0b, #ef4444{% endif %});">
 
-                        <div class="z-2">
+                        {% if category_map and section in category_map %}
+                        <!-- Background image -->
+                        <img src="{{ url_for('static', filename='images/' + category_map[section]) }}"
+                            class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover; z-index: 1;"
+                            onerror="this.src='https://via.placeholder.com/400x300/1e293b/ffffff?text={{ section|urlencode }}'">
+                        <!-- Image only, text is in the button below -->
+                        {% else %}
+                        <div class="z-2 text-center">
                             {% if 'Shirt' in section or 'T-Shirt' in section %}
                             <i class="fas fa-tshirt fa-4x mb-3 text-white opacity-75"></i>
                             {% elif 'Hoodie' in section %}
@@ -93,6 +113,7 @@
 
                             <h3 class="fw-bold mb-0 text-white">{{ section }}</h3>
                         </div>
+                        {% endif %}
                     </div>
                     <div class="card-footer bg-white text-dark py-3 border-0">
                         <span class="fw-bold text-uppercase small ls-1">Browse {{ section }}</span>
@@ -108,53 +129,59 @@
     </div>
 </div>
 
-<div class="bg-light py-5">
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-end mb-5">
-            <div>
+<div class="bg-light py-4 py-md-5">
+    <div class="container py-3 py-md-4">
+        <div
+            class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-end mb-4 mb-md-5 gap-3 reveal">
+            <div class="text-center text-sm-start">
                 <h2 class="fw-bolder text-dark mb-1">New Arrivals</h2>
                 <p class="text-muted mb-0">Freshly printed custom merchandise</p>
             </div>
-            <a href="{{ url_for('user_bp.shop') }}" class="btn btn-outline-dark rounded-pill px-4 fw-bold">View All</a>
+            <a href="{{ url_for('user_bp.shop') }}"
+                class="btn btn-outline-dark rounded-pill px-4 fw-bold align-self-start align-self-sm-auto btn-ripple">View
+                All</a>
         </div>
 
         <div class="row g-4">
             {% if products %}
             {% for product in products %}
-            <div class="col-md-6 col-lg-3">
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 reveal stagger-{{ (loop.index0 % 6) + 1 }}">
                 <div class="card h-100 border-0 shadow-sm hover-up rounded-4 overflow-hidden">
-                    <div class="position-relative bg-white"
-                        style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                        <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}" class="w-100 h-100">
-                            <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
-                                class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{ product.name }}"
+
+                    <div class="position-relative bg-light p-2 p-md-3"
+                        style="aspect-ratio: 1 / 1; max-height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}"
+                            class="w-100 h-100 d-flex align-items-center justify-content-center">
+                            <img src="{{ url_for('static', filename='images/' + product.image_file) }}"
+                                class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;"
+                                alt="{{ product.name }}"
                                 onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
                         </a>
 
                         {% if product.shipping_charge == 0 %}
                         <span
-                            class="position-absolute top-0 start-0 m-3 badge bg-success bg-opacity-75 backdrop-blur shadow-sm">Free
+                            class="position-absolute top-0 start-0 m-2 m-md-3 badge bg-success bg-opacity-75 backdrop-blur shadow-sm small">Free
                             Ship</span>
                         {% endif %}
 
                         <span
-                            class="position-absolute bottom-0 start-0 m-3 badge bg-dark bg-opacity-50 backdrop-blur shadow-sm">
+                            class="position-absolute bottom-0 start-0 m-2 m-md-3 badge bg-dark bg-opacity-50 backdrop-blur shadow-sm small">
                             {{ product.category }}
                         </span>
                     </div>
-
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold text-dark mb-1 text-truncate">
+                    <div class="card-body p-2 p-md-3">
+                        <h6 class="card-title fw-bold text-dark mb-1 text-truncate" style="font-size: 0.95rem;">
                             <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}"
                                 class="text-decoration-none text-dark">
                                 {{ product.name }}
                             </a>
-                        </h5>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="h5 fw-bold text-primary mb-0">₹{{ product.base_price }}</span>
+                        </h6>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 gap-2">
+                            <span class="fw-bold text-primary mb-0" style="font-size: 0.95rem;">₹{{ product.base_price
+                                }}</span>
                             <a href="{{ url_for('user_bp.product_detail', product_id=product.id) }}"
-                                class="btn btn-sm btn-dark rounded-pill px-3">
-                                View <i class="fas fa-arrow-right ms-1"></i>
+                                class="btn btn-sm btn-dark rounded-pill px-2 px-md-3" style="font-size: 0.75rem;">
+                                VIEW <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -171,36 +198,17 @@
     </div>
 </div>
 
-<style>
-    /* Animation Utilities */
-    .hover-scale {
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
 
-    .hover-scale:hover {
-        transform: scale(1.05);
-    }
 
-    .hover-up {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .hover-up:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .ls-1 {
-        letter-spacing: 1px;
-    }
-
-    .drop-shadow {
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .backdrop-blur {
-        backdrop-filter: blur(5px);
-    }
-</style>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var myCarousel = document.querySelector('#heroCarousel');
+        var carousel = new bootstrap.Carousel(myCarousel, {
+            interval: 2000,
+            ride: 'carousel',
+            pause: false
+        });
+        carousel.cycle();
+    });
+</script>
 {% endblock %}

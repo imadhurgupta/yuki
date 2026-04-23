@@ -5,88 +5,107 @@
 {% block content %}
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-5">
 
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-lock me-2"></i>Secure Payment</h5>
-                    <span class="badge bg-success">₹{{ order.total_price }}</span>
-                </div>
 
-                <div class="card-body p-0">
-                    <ul class="nav nav-pills nav-fill bg-light p-2" id="paymentTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold rounded-pill" id="card-tab" data-bs-toggle="tab"
-                                data-bs-target="#card" type="button">
-                                <i class="fas fa-credit-card me-2"></i>Card
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold rounded-pill" id="upi-tab" data-bs-toggle="tab"
-                                data-bs-target="#upi" type="button">
-                                <i class="fas fa-mobile-alt me-2"></i>UPI / QR
-                            </button>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content p-4">
-
-                        <div class="tab-pane fade show active" id="card" role="tabpanel">
-                            <form action="{{ url_for('user_bp.process_payment', order_id=order.id) }}" method="POST"
-                                id="cardForm">
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold text-muted">Card Number</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fab fa-cc-visa"></i></span>
-                                        <input type="text" class="form-control" placeholder="0000 0000 0000 0000"
-                                            maxlength="19" required>
-                                    </div>
-                                </div>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-6">
-                                        <label class="form-label small fw-bold text-muted">Expiry</label>
-                                        <input type="text" class="form-control" placeholder="MM/YY" maxlength="5"
-                                            required>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label small fw-bold text-muted">CVV</label>
-                                        <input type="password" class="form-control" placeholder="123" maxlength="3"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-lg shadow-sm"
-                                        onclick="showLoader(this)">
-                                        Pay ₹{{ order.total_price }}
-                                    </button>
-                                </div>
-                            </form>
+                <div class="card-header bg-dark text-white py-3 text-center">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Secure Payment</h5>
+                    <div class="mt-2 d-flex justify-content-center gap-2">
+                        <div class="bg-success px-3 py-1 rounded-3">
+                            <small class="d-block text-uppercase" style="font-size: 0.6rem; opacity: 0.9;">
+                                {% if (order and order.payment_method == '100_online') or payment_method == '100_online'
+                                %}Full Payment (100%){% else %}Mandatory Advance ({{ (advance_percentage|round|int) if
+                                advance_percentage else 40 }}%){% endif %}
+                            </small>
+                            <span class="fs-5 fw-bold">₹{{ "%.2f"|format(total_advance) }}</span>
                         </div>
-
-                        <div class="tab-pane fade text-center" id="upi" role="tabpanel">
-                            <div class="my-3">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=shop@upi&pn=AtipriyaPrints&am={{ order.total_price }}"
-                                    class="img-fluid border p-2 rounded shadow-sm mb-3">
-                                <p class="text-muted small mb-4">Scan using any UPI App (GPay, PhonePe, Paytm)</p>
-
-                                <form action="{{ url_for('user_bp.process_payment', order_id=order.id) }}"
-                                    method="POST">
-                                    <div class="d-grid px-5">
-                                        <button type="submit" class="btn btn-success btn-lg shadow-sm"
-                                            onclick="showLoader(this)">
-                                            <i class="fas fa-check-circle me-2"></i>I Have Paid
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                        {% if (order and order.payment_method != '100_online') or (not order and payment_method !=
+                        '100_online') %}
+                        <div class="bg-secondary px-3 py-1 rounded-3 opacity-75">
+                            <small class="d-block text-uppercase" style="font-size: 0.6rem; opacity: 0.9;">Total Order
+                                Value</small>
+                            <span class="fs-5 fw-bold">₹{{ "%.2f"|format(grand_total) }}</span>
                         </div>
-
+                        {% endif %}
                     </div>
                 </div>
 
+                <div class="bg-warning-subtle text-warning-emphasis p-2 text-center small fw-bold border-bottom">
+                    <i class="fas fa-info-circle me-1"></i>
+                    {% if (order and order.payment_method == '100_online') or payment_method == '100_online' %}
+                    Paying full amount for hassle-free delivery.
+                    {% else %}
+                    {{ (advance_percentage|round|int) if advance_percentage else 40 }}% Advance is mandatory to process
+                    your order.
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-4 text-center">
+
+                    <h6 class="fw-bold text-muted mb-3 text-uppercase small ls-1">Scan QR to Pay</h6>
+
+                    <div class="qr-container mb-3">
+                        {% if qr_code %}
+                        <img src="{{ url_for('static', filename='images/' + qr_code) }}"
+                            class="img-fluid border p-2 rounded shadow-sm" style="max-width: 260px; height: auto;">
+
+                        {% elif generated_qr_url %}
+                        <img src="{{ generated_qr_url }}" class="img-fluid border p-2 rounded shadow-sm">
+
+                        <div class="mt-3">
+                            <div class="badge bg-light text-dark border px-3 py-2 fw-normal">
+                                UPI ID: <strong class="user-select-all">{{ shop_upi_id }}</strong>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=upi://pay?pa={{ shop_upi_id }}%26pn=Yuki%26am={{ '%.2f'|format(total_advance) }}%26cu=INR"
+                            class="img-fluid border p-2 rounded shadow-sm">
+
+                        <div class="mt-3">
+                            <div class="badge bg-light text-dark border px-3 py-2 fw-normal">
+                                UPI ID: <strong class="user-select-all">{{ shop_upi_id }}</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <p class="text-muted small mb-4">
+                        <i class="fas fa-mobile-alt me-1"></i> Scan using <strong>GPay, PhonePe, or Paytm</strong>
+                    </p>
+
+                    <hr class="my-4 text-muted opacity-25">
+
+                    <div class="text-start">
+                        <h6 class="fw-bold small text-uppercase mb-3"><i class="fas fa-receipt me-2"></i>Verify Payment
+                        </h6>
+
+                        <form
+                            action="{% if pending %}{{ url_for('user_bp.process_payment_pending') }}{% else %}{{ url_for('user_bp.process_payment', order_id=order.id) }}{% endif %}"
+                            method="POST" enctype="multipart/form-data">
+
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Upload Payment Screenshot</label>
+                                <input type="file" name="payment_proof" class="form-control" accept="image/*" required>
+                                <div class="form-text x-small">Please upload the success screen from your UPI app. Max
+                                    Size: 20MB.</div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg shadow-sm rounded-pill fw-bold"
+                                    onclick="return showLoader(this);">
+                                    <i class="fas fa-upload me-2"></i>Submit for Verification
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
                 <div class="card-footer bg-light text-center py-3">
-                    <small class="text-muted"><i class="fas fa-shield-alt text-success me-1"></i> 256-bit SSL
-                        Encrypted</small>
+                    <small class="text-muted"><i class="fas fa-lock text-success me-1"></i> 100% Secure
+                        Transaction</small>
                 </div>
             </div>
 
@@ -94,11 +113,21 @@
     </div>
 </div>
 
+
+
 <script>
     function showLoader(btn) {
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        const fileInput = document.querySelector('input[name="payment_proof"]');
+        if (fileInput && fileInput.files.length > 0) {
+            const fileSize = fileInput.files[0].size / 1024 / 1024; // in MB
+            if (fileSize > 20) {
+                alert("File size exceeds 20MB. Please upload a smaller image.");
+                fileInput.value = ""; // Clear the input
+                return false;
+            }
+        }
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Uploading...';
         btn.classList.add('disabled');
-        // Allow form to submit normally
     }
 </script>
 {% endblock %}

@@ -2,52 +2,165 @@
 
 {% block title %}Order #{{ order.transaction_id }}{% endblock %}
 
+{% block head %}
+<style>
+    @media print {
+        body {
+            background: white !important;
+        }
+
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .invoice-wrapper {
+            border: none !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        @page {
+            size: auto;
+            margin: 5mm;
+        }
+
+        .invoice-header {
+            background: #0f172a !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            border-radius: 0 !important;
+        }
+
+        .text-primary {
+            color: #4f46e5 !important;
+        }
+
+        .bg-light {
+            background-color: #f8fafc !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
+<div class="container py-3 py-md-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4 no-print">
         <a href="{{ url_for('admin_bp.dashboard') }}" class="btn btn-outline-dark rounded-pill px-4">
             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
         </a>
         <div class="d-flex gap-2">
+            <a href="{{ url_for('user_bp.generate_invoice', txn_id=order.transaction_id) }}" target="_blank"
+                class="btn btn-outline-primary rounded-pill px-4">
+                <i class="fas fa-file-invoice-dollar me-2"></i>Download Invoice
+            </a>
             <button onclick="window.print()" class="btn btn-success rounded-pill px-4">
                 <i class="fas fa-print me-2"></i>Print Receipt
             </button>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-0 p-5 bg-white" id="invoice">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white" id="invoiceArea">
 
-        <div class="row mb-5 border-bottom pb-4">
+        <div class="row mb-4 border-bottom pb-4">
             <div class="col-6">
-                <h3 class="fw-bold text-uppercase letter-spacing-2 mb-1">Atipriya Prints</h3>
-                <p class="text-muted small">Custom Printing Solutions</p>
+                <div class="brand-logo-premium mb-1" style="font-size: 1.3rem;">
+                    <span>Yuki</span>
+                </div>
+                <p class="text-muted small mb-0">Premium Custom Print Solutions</p>
             </div>
             <div class="col-6 text-end">
-                <h4 class="fw-bold text-primary mb-1">INVOICE</h4>
-                <p class="text-muted mb-0">#{{ order.transaction_id }}</p>
-                <p class="small text-muted mb-0">Date: {{ order.date_ordered.strftime('%d %b, %Y') }}</p>
+                <h4 class="fw-900 text-primary mb-1">OFFICIAL RECEIPT</h4>
+                <p class="text-muted mb-0 fw-bold">#{{ order.transaction_id }}</p>
+                <p class="small text-muted mb-0">Issue Date: {{ order.date_ordered.strftime('%d %b, %Y') }}</p>
             </div>
         </div>
 
-        <div class="row mb-5">
+        {% if order.payment_proof %}
+        <div
+            class="card mb-5 border shadow-sm rounded-4 no-print {% if order.status == 'Verification Pending' %}border-warning bg-warning bg-opacity-10{% else %}border-success bg-success bg-opacity-10{% endif %}">
+            <div class="card-body text-center py-4">
+                {% if order.status == 'Verification Pending' %}
+                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-receipt text-warning me-2"></i>Payment Verification
+                    Required</h6>
+                {% else %}
+                <h6 class="fw-bold text-success mb-3"><i class="fas fa-check-double me-2"></i>Payment Verified &
+                    Confirmed</h6>
+                {% endif %}
+
+                <a href="{{ url_for('static', filename='images/' + order.payment_proof) }}" target="_blank">
+                    <img src="{{ url_for('static', filename='images/' + order.payment_proof) }}"
+                        class="img-fluid rounded border shadow-sm mb-3 bg-white"
+                        style="max-height: 300px; cursor: zoom-in;" title="Click to view full size">
+                </a>
+
+                {% if order.status == 'Verification Pending' %}
+                <div class="d-flex justify-content-center gap-3">
+                    <form action="{{ url_for('admin_bp.update_order', order_id=order.id) }}" method="POST"
+                        class="d-flex flex-column align-items-center gap-2">
+                        <label class="small fw-bold text-muted mb-0">Record Payment (Adv: ₹{{
+                            "%.2f"|format(order.advance_amount) }})</label>
+                        <div class="input-group input-group-sm" style="max-width: 200px;">
+                            <span class="input-group-text bg-success text-white">₹</span>
+                            <input type="number" name="amount_paid" step="0.01" class="form-control fw-bold"
+                                value="{{ '%.2f'|format(order.advance_amount) }}" required>
+                        </div>
+                        <input type="hidden" name="status" value="Processing">
+                        <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
+                            <i class="fas fa-check-circle me-2"></i>Approve & Set Paid
+                        </button>
+                    </form>
+                    <form action="{{ url_for('admin_bp.update_order', order_id=order.id) }}" method="POST">
+                        <input type="hidden" name="status" value="Cancelled">
+                        <button type="submit"
+                            class="btn btn-outline-danger rounded-pill px-4 fw-bold shadow-sm bg-white">
+                            <i class="fas fa-times-circle me-2"></i>Reject
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row mb-5 gy-4">
             <div class="col-md-6">
-                <h6 class="text-uppercase text-muted fw-bold small mb-3">Bill To:</h6>
-                <h5 class="fw-bold text-dark">{{ order.full_name }}</h5>
-                <p class="text-muted mb-1">{{ order.address }}</p>
-                <p class="text-muted mb-1"><i class="fas fa-phone me-2 small"></i>{{ order.mobile_number }}</p>
-                <p class="text-muted"><i class="fas fa-envelope me-2 small"></i>{{ order.email }}</p>
+                <h6 class="text-uppercase text-muted fw-bold small mb-2 ls-1">Customer / Bill To:</h6>
+                <h5 class="fw-900 text-dark mb-1">{{ order.full_name }}</h5>
+                <p class="text-muted small mb-1">{{ order.address }}</p>
+                <div class="d-flex gap-3 mt-2">
+                    <span class="text-muted small"><i class="fas fa-phone me-1 small"></i>{{ order.mobile_number
+                        }}</span>
+                    <span class="text-muted small"><i class="fas fa-envelope me-1 small"></i>{{ order.email }}</span>
+                </div>
             </div>
             <div class="col-md-6 text-md-end">
-                <h6 class="text-uppercase text-muted fw-bold small mb-3">Order Status:</h6>
-                <span class="badge rounded-pill px-3 py-2 fs-6 mb-2
-                    {% if order.status == 'Delivered' %}bg-success
-                    {% elif order.status == 'Shipped' %}bg-info text-dark
-                    {% else %}bg-warning text-dark{% endif %}">
-                    {{ order.status }}
-                </span>
-                <p class="text-muted mt-2">Payment Method: <span class="fw-bold text-dark">{{ order.payment_method
-                        }}</span></p>
+                <h6 class="text-uppercase text-muted fw-bold small mb-2 ls-1">Payment Details:</h6>
+                <div class="small mb-1">Method: <span class="fw-bold">{% if order.payment_method == "100_online" %}100%
+                        Online{% else %}Partial Advance{% endif %}</span></div>
+                <div class="small mb-1">Status: <span
+                        class="badge rounded-pill {% if order.status in ['Delivered', 'Completed'] %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-primary{% endif %} px-3">{{
+                        order.status }}</span></div>
+                {% if total_paid > 0 %}
+                <div class="text-success small fw-bold mt-1">Total Verified: ₹{{ "%.2f"|format(total_paid) }}</div>
+                {% endif %}
             </div>
         </div>
 
@@ -55,89 +168,63 @@
             <table class="table table-borderless align-middle">
                 <thead class="bg-light">
                     <tr>
-                        <th class="py-3 ps-4">Item Description</th>
-                        <th class="py-3 text-center">Size</th>
-                        <th class="py-3 text-center">Qty</th>
-                        <th class="py-3 text-end pe-4">Amount</th>
+                        <th class="py-3 ps-3 text-uppercase small ls-1 fw-800">Item Description</th>
+                        <th class="py-3 text-center text-uppercase small ls-1 fw-800">Size</th>
+                        <th class="py-3 text-center text-uppercase small ls-1 fw-800">Qty</th>
+                        <th class="py-3 text-end pe-3 text-uppercase small ls-1 fw-800">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for item in items %}
                     <tr class="border-bottom">
-                        <td class="py-4 ps-4">
+                        <td class="py-3 ps-3">
                             <div class="d-flex align-items-center">
-                                <img src="{{ url_for('static', filename='uploads/' + order.product.image_file) }}"
-                                    class="rounded border me-3 d-print-none" width="50" height="50"
-                                    style="object-fit: cover;">
+                                {% if item.product %}
+                                <img src="{{ url_for('static', filename='images/' + item.product.image_file) }}"
+                                    class="rounded me-3 d-print-none" width="45" height="45" style="object-fit: cover;">
                                 <div>
-                                    <div class="fw-bold">{{ order.product.name }}</div>
-                                    <div class="small text-muted">{{ order.product.section }} > {{
-                                        order.product.category }}</div>
-                                    {% if order.instructions %}
-                                    <div class="small text-danger mt-1 fst-italic">Note: {{ order.instructions }}</div>
+                                    <div class="fw-bold">{{ item.product.name }}</div>
+                                    <div class="x-small text-muted">{{ item.product.category }}</div>
+                                    {% if item.instructions %}
+                                    <div class="x-small text-danger mt-1"><em>Note: {{ item.instructions }}</em></div>
                                     {% endif %}
                                 </div>
+                                {% else %}
+                                <div class="fw-bold text-danger">Product Deleted</div>
+                                {% endif %}
                             </div>
                         </td>
-                        <td class="text-center">{{ order.size }}</td>
-                        <td class="text-center">{{ order.quantity }}</td>
-                        <td class="text-end fw-bold pe-4">₹{{ order.total_price }}</td>
+                        <td class="text-center small">{{ item.size }}</td>
+                        <td class="text-center fw-bold">{{ item.quantity }}</td>
+                        <td class="text-end fw-bold pe-3">₹{{ "%.0f"|format(item.total_price) }}</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <div class="row justify-content-end">
-            <div class="col-md-4">
-                <table class="table table-borderless table-sm">
-                    <tr>
-                        <td class="text-muted">Subtotal</td>
-                        <td class="text-end">₹{{ order.product.base_price * order.quantity }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Shipping</td>
-                        <td class="text-end">₹{{ order.product.shipping_charge }}</td>
-                    </tr>
-                    <tr class="border-top">
-                        <td class="pt-3 fw-bold fs-5">Total</td>
-                        <td class="pt-3 fw-bold fs-5 text-end text-primary">₹{{ order.total_price }}</td>
-                    </tr>
-                </table>
+            <div class="col-md-5">
+                <div class="card border-0 bg-light p-3 rounded-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Grand Total</span>
+                        <span class="fw-bold text-dark">₹{{ "%.2f"|format(grand_total) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-success small fw-bold">Received (Verified)</span>
+                        <span class="text-success fw-bold">₹{{ "%.2f"|format(total_paid) }}</span>
+                    </div>
+                    <div class="border-top pt-2 d-flex justify-content-between">
+                        <span class="fw-900 text-dark">Balance Due</span>
+                        <span class="fw-900 text-danger fs-5">₹{{ "%.2f"|format(grand_total - total_paid) }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="mt-5 pt-4 border-top text-center text-muted small">
-            <p class="mb-1">Thank you for shopping with Atipriya Prints!</p>
-            <p>For support, contact us at: support@atipriyaprints.com</p>
+        <div class="mt-5 text-center text-muted x-small d-none d-print-block">
+            <p class="mb-0">Computer generated receipt by Yuki.</p>
         </div>
     </div>
 </div>
-
-<style>
-    /* Print Styles */
-    @media print {
-        body * {
-            visibility: hidden;
-        }
-
-        #invoice,
-        #invoice * {
-            visibility: visible;
-        }
-
-        #invoice {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 20px !important;
-            box-shadow: none !important;
-            border: none !important;
-        }
-
-        .no-print {
-            display: none !important;
-        }
-    }
-</style>
 {% endblock %}

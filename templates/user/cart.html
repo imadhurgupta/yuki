@@ -4,11 +4,11 @@
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="mb-4 fw-bold">Shopping Cart ({{ cart|length }} items)</h2>
+    <h2 class="mb-4 fw-bold reveal">Shopping Cart ({{ cart|length }} items)</h2>
 
     {% if cart %}
     <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-8 reveal-left">
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -27,9 +27,8 @@
                                 <tr>
                                     <td class="ps-4 py-3">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{ url_for('static', filename='uploads/' + item.product.image_file) }}"
-                                                class="rounded-3 me-3"
-                                                style="width: 60px; height: 60px; object-fit: cover;">
+                                            <img src="{{ url_for('static', filename='images/' + item.product.image_file) }}"
+                                                class="cart-thumb me-3">
                                             <div>
                                                 <h6 class="mb-0 fw-bold">{{ item.product.name }}</h6>
                                                 <small class="text-muted">{{ item.product.section }}</small>
@@ -43,66 +42,89 @@
                                             item.quantity }}</span>
                                     </td>
 
-                                    <td class="text-end fw-bold">₹{{ item.product.base_price }}</td>
-
-                                    <td class="text-end pe-4">
-                                        <a href="{{ url_for('user_bp.remove_from_cart', cart_id=item.id) }}"
-                                            class="text-danger" title="Remove Item">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    <td class="text-end fw-bold">
+                                        {% if item.product.get_price_for_quantity(item.quantity) <
+                                            item.product.base_price %} <div
+                                            class="text-muted text-decoration-line-through small">₹{{
+                                            "%.2f"|format(item.product.base_price * item.quantity) }}
                     </div>
-                </div>
-            </div>
-        </div>
+                    <div class="text-success">₹{{ "%.2f"|format(item.product.get_price_for_quantity(item.quantity) *
+                        item.quantity) }}</div>
+                    {% else %}
+                    <div>₹{{ "%.2f"|format(item.product.base_price * item.quantity) }}</div>
+                    {% endif %}
+                    </td>
 
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold">Order Summary</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Subtotal</span>
-                        <span class="fw-bold">₹{{ subtotal }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
-                        <span class="text-muted">Shipping</span>
-                        <span class="text-success">{{ 'Free' if shipping == 0 else '₹' ~ shipping }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="h5 fw-bold">Total</span>
-                        <span class="h5 fw-bold text-primary">₹{{ total }}</span>
-                    </div>
-
-                    <a href="{{ url_for('user_bp.checkout_cart') }}"
-                        class="btn btn-dark w-100 py-3 rounded-pill fw-bold shadow-lg">
-                        Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
-                    </a>
-
-                    <a href="{{ url_for('user_bp.shop') }}"
-                        class="btn btn-outline-secondary w-100 py-2 rounded-pill mt-2 border-0">
-                        Continue Shopping
-                    </a>
+                    <td class="text-end pe-4">
+                        <a href="{{ url_for('user_bp.remove_from_cart', cart_id=item.id) }}" class="text-danger"
+                            title="Remove Item">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    {% else %}
-    <div class="text-center py-5">
-        <div class="mb-4">
-            <i class="fas fa-shopping-cart text-muted opacity-25" style="font-size: 5rem;"></i>
+
+    <div class="col-lg-4 reveal-right">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">Order Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Subtotal (Original)</span>
+                    <span class="fw-bold">₹{{ "%.2f"|format(original_subtotal) }}</span>
+                </div>
+                {% if bulk_savings > 0 %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-success"><i class="fas fa-layer-group me-1"></i> Bulk Savings</span>
+                    <span class="fw-bold text-success">-₹{{ "%.2f"|format(bulk_savings) }}</span>
+                </div>
+                {% endif %}
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
+                    <span class="text-muted">Shipping</span>
+                    <span class="text-success">{{ 'Free' if shipping == 0 else '₹' ~ shipping }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="h5 fw-bold">Total</span>
+                    <span class="h5 fw-bold text-primary">₹{{ total }}</span>
+                </div>
+
+                <div class="alert alert-info py-2 px-3 border-0 rounded-3 mb-4" style="font-size: 0.85rem;">
+                    <i class="fas fa-info-circle me-1"></i> <strong>Mandatory Advance</strong> is required to
+                    confirm
+                    orders.
+                </div>
+
+                <a href="{{ url_for('user_bp.checkout_cart') }}"
+                    class="btn btn-dark w-100 py-3 rounded-pill fw-bold shadow-lg">
+                    Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+
+                <a href="{{ url_for('user_bp.shop') }}"
+                    class="btn btn-outline-secondary w-100 py-2 rounded-pill mt-2 border-0">
+                    Continue Shopping
+                </a>
+            </div>
         </div>
-        <h3 class="fw-bold">Your cart is empty</h3>
-        <p class="text-muted mb-4">Looks like you haven't added anything yet.</p>
-        <a href="{{ url_for('user_bp.shop') }}" class="btn btn-primary rounded-pill px-5 py-3 fw-bold">
-            Start Shopping
-        </a>
     </div>
-    {% endif %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="fas fa-shopping-cart text-muted opacity-25" style="font-size: 5rem;"></i>
+    </div>
+    <h3 class="fw-bold">Your cart is empty</h3>
+    <p class="text-muted mb-4">Looks like you haven't added anything yet.</p>
+    <a href="{{ url_for('user_bp.shop') }}" class="btn btn-primary rounded-pill px-5 py-3 fw-bold">
+        Start Shopping
+    </a>
+</div>
+{% endif %}
 </div>
 {% endblock %}

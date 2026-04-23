@@ -2,117 +2,271 @@
 
 {% block title %}Invoice #{{ order.transaction_id }}{% endblock %}
 
-{% block content %}
-<div class="container mt-5 mb-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-        <a href="{{ url_for('user_bp.profile')}}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Back to Orders
-        </a>
-        <button onclick="window.print()" class="btn btn-primary shadow-sm">
-            <i class="fas fa-print me-2"></i>Print Invoice
-        </button>
-    </div>
-
-    <div class="card border-0 shadow-lg rounded-0 p-5" id="invoiceArea">
-
-        <div class="row mb-5 border-bottom pb-4 align-items-center">
-            <div class="col-6">
-                <h2 class="fw-bold text-uppercase text-primary mb-0">Atipriya Prints</h2>
-                <p class="text-muted small">Premium Custom Printing Solutions</p>
-            </div>
-            <div class="col-6 text-end">
-                <h4 class="fw-bold mb-1">INVOICE</h4>
-                <p class="mb-0 text-muted">Transaction ID: <span class="font-monospace">{{ order.transaction_id
-                        }}</span></p>
-                <span class="badge bg-success bg-opacity-10 text-success border border-success mt-2 px-3">
-                    {{ 'PAID' if order.status != 'Pending' else 'PAYMENT PENDING' }}
-                </span>
-            </div>
-        </div>
-
-        <div class="row mb-5">
-            <div class="col-6">
-                <p class="fw-bold text-uppercase text-muted small mb-2">Billed To:</p>
-                <h5 class="fw-bold mb-1">{{ order.full_name }}</h5>
-                <p class="mb-0 text-muted">{{ order.mobile_number }}</p>
-                <p class="text-muted small" style="white-space: pre-wrap;">{{ order.address }}</p>
-            </div>
-            <div class="col-6 text-end">
-                <p class="fw-bold text-uppercase text-muted small mb-2">Order Details:</p>
-                <p class="mb-1"><strong>Date:</strong> {{ order.date_ordered.strftime('%d %b, %Y') }}</p>
-                <p class="mb-0"><strong>Payment Method:</strong> {{ order.payment_method }}</p>
-            </div>
-        </div>
-
-        <div class="table-responsive mb-4">
-            <table class="table table-bordered border-light">
-                <thead class="bg-light text-uppercase small fw-bold">
-                    <tr>
-                        <th class="py-3 ps-4">Item Description</th>
-                        <th class="py-3 text-center">Size</th>
-                        <th class="py-3 text-center">Qty</th>
-                        <th class="py-3 text-end pe-4">Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td class="ps-4 py-3">
-                            {% if item.product %}
-                            <span class="fw-bold d-block">{{ item.product.name }}</span>
-                            <small class="text-muted">{{ item.product.section }} / {{ item.product.category }}</small>
-                            {% else %}
-                            <span class="fw-bold d-block text-danger">Product Deleted</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center py-3">{{ item.size }}</td>
-                        <td class="text-center py-3">{{ item.quantity }}</td>
-                        <td class="text-end pe-4 py-3">₹{{ "%.2f"|format(item.total_price) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot class="bg-white">
-                    <tr>
-                        <td colspan="3" class="text-end fw-bold py-3">Grand Total</td>
-                        <td class="text-end pe-4 py-3 h5 fw-bold text-success">₹{{ "%.2f"|format(grand_total) }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <div class="text-center mt-5 pt-4 border-top">
-            <p class="fw-bold mb-1">Thank you for your order!</p>
-            <p class="text-muted small mb-0">For support, contact: support@atipriyaprints.com</p>
-        </div>
-
-    </div>
-</div>
-
+{% block head %}
 <style>
     @media print {
-        body * {
-            visibility: hidden;
+        body {
+            background: white !important;
+            padding: 0 !important;
         }
 
-        #invoiceArea,
-        #invoiceArea * {
-            visibility: visible;
-        }
-
-        #invoiceArea {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            box-shadow: none !important;
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
         .no-print {
             display: none !important;
         }
+
+        .invoice-wrapper {
+            border: none !important;
+            box-shadow: none !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        @page {
+            size: auto;
+            margin: 10mm;
+        }
+
+        .invoice-header {
+            border-radius: 0 !important;
+            padding: 20px 30px !important;
+        }
+
+        .invoice-body {
+            padding: 20px 30px !important;
+        }
+
+        .reveal,
+        .reveal-scale,
+        .reveal-left,
+        .reveal-right {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+
+        .grand-total-row td {
+            padding-top: 20px !important;
+            padding-bottom: 20px !important;
+        }
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3 mb-5">
+
+    <div
+        class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-3 mb-4 no-print reveal">
+        <a href="{{ url_for('user_bp.profile')}}" class="btn btn-outline-dark btn-ripple">
+            <i class="fas fa-arrow-left me-2"></i>Back to Orders
+        </a>
+        <button onclick="window.print()" class="btn btn-primary btn-ripple pulse-glow">
+            <i class="fas fa-print me-2"></i>Print Invoice
+        </button>
+    </div>
+
+    <div class="invoice-wrapper reveal-scale" id="invoiceArea">
+
+        <!-- Header Band -->
+        <div class="invoice-header">
+            <div class="row align-items-center gy-4">
+                <div class="col-md-7">
+                    <div class="brand-logo-light mb-2">
+                        <span>Yuki</span>
+                    </div>
+                    <p class="text-white-50 x-small mb-0 fw-800 opacity-75 ls-1">PREMIUM PRINTING SOLUTIONS</p>
+                </div>
+                <div class="col-md-5 text-md-end">
+                    <div class="d-inline-block text-start text-md-end w-100">
+                        <p class="text-white-50 x-small text-uppercase tracking-wider mb-2 fw-800">Tax Invoice / Receipt
+                            • {{ items|length }} {{ 'Item' if items|length == 1 else 'Items' }}</p>
+                        <h3 class="text-white fw-900 mb-3 fs-3 fs-md-2 text-truncate">#{{ order.transaction_id[:12] }}
+                        </h3>
+                        {% set total_paid = items|sum(attribute='amount_paid')|float %}
+                        {% set is_fully_paid = total_paid >= (grand_total|float - 0.01) %}
+
+                        {% if order.status == 'Cancelled' %}
+                        <span class="badge-invoice danger shadow-sm">VOID / CANCELLED</span>
+                        {% elif order.status == 'Verification Pending' %}
+                        <span class="badge-invoice info shadow-sm">VERIFYING PROOF</span>
+                        {% elif order.status == 'Pending' %}
+                        <span class="badge-invoice warning shadow-sm">AWAITING PAYMENT</span>
+                        {% elif not is_fully_paid %}
+                        <span class="badge-invoice warning shadow-sm">PARTIALLY PAID</span>
+                        {% else %}
+                        <span class="badge-invoice success shadow-sm">✓ FULLY PAID</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="invoice-body">
+
+            <!-- Entity Info -->
+            <div class="row mb-2 gy-2">
+                <div class="col-md-6 reveal-left">
+                    <p class="invoice-section-label mb-2">Bill To</p>
+                    <h5 class="fw-900 text-dark mb-1">{{ order.full_name }}</h5>
+                    <div class="d-flex flex-column gap-1">
+                        <span class="text-muted small"><i class="fas fa-phone-alt me-2 x-small opacity-50"></i>{{
+                            order.mobile_number }}</span>
+                        {% if order.email %}
+                        <span class="text-muted small"><i class="fas fa-envelope me-2 x-small opacity-50"></i>{{
+                            order.email }}</span>
+                        {% endif %}
+                        {% if order.address %}
+                        <span class="text-muted small"><i class="fas fa-map-marker-alt me-2 x-small opacity-50"></i>{{
+                            order.address }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end reveal-right">
+                    <p class="invoice-section-label mb-2">Order Info</p>
+                    <div class="d-flex flex-column gap-0">
+                        <div class="d-flex justify-content-md-end gap-3">
+                            <span class="text-muted small">Date:</span>
+                            <span class="fw-bold small text-dark">{{ order.date_ordered.strftime('%d %b, %Y') }}</span>
+                        </div>
+                        <div class="d-flex justify-content-md-end gap-3">
+                            <span class="text-muted small">Method:</span>
+                            <span class="fw-bold small text-dark">
+                                {% if order.payment_method == "100_online" %}Full Payment
+                                {% elif order.payment_method == "40_advance" %}Partial (Advance)
+                                {% else %}{{ order.payment_method }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="reveal mt-4">
+                <div class="table-responsive">
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">Item Description</th>
+                                <th class="text-center">Size</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-end pe-3">Unit Price</th>
+                                <th class="text-end pe-3">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="ps-3">
+                                    {% if item.product %}
+                                    <span class="fw-800 text-dark d-block mb-1">{{ item.product.name }}</span>
+                                    <span class="badge bg-light text-muted border fw-normal">{{ item.product.category
+                                        }}</span>
+                                    {% else %}
+                                    <span class="fw-bold text-danger">Product Removed</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center text-muted small">{{ item.size }}</td>
+                                <td class="text-center text-dark fw-bold">{{ item.quantity }}</td>
+                                <td class="text-end pe-3 text-muted">₹{{ (item.total_price / item.quantity)|int }}</td>
+                                <td class="text-end pe-3 fw-800 text-dark">₹{{ item.total_price|int }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            {% set ns = namespace(subtotal=0, bulk=0, coupon=0, shipping=0) %}
+                            {% for item in items %}
+                            {% if item.product %}
+                            {% set ns.subtotal = ns.subtotal + (item.product.base_price * item.quantity) %}
+                            {% set ns.bulk = ns.bulk + ((item.product.base_price * item.quantity) -
+                            (item.product.get_price_for_quantity(item.quantity) * item.quantity)) %}
+                            {% set ns.shipping = ns.shipping + item.product.shipping_charge %}
+                            {% else %}
+                            {% set ns.subtotal = ns.subtotal + item.total_price + item.discount_amount %}
+                            {% endif %}
+                            {% set ns.coupon = ns.coupon + item.discount_amount %}
+                            {% endfor %}
+
+                            <tr class="tfoot-row">
+                                <td colspan="4" class="text-end pe-4 py-1 text-muted x-small text-uppercase ls-1">
+                                    Subtotal</td>
+                                <td class="text-end pe-3 py-1 fw-bold text-dark border-bottom">₹{{ ns.subtotal|int }}
+                                </td>
+                            </tr>
+                            {% if ns.bulk > 0 %}
+                            <tr class="tfoot-row">
+                                <td colspan="4" class="text-end pe-4 py-1 text-success x-small text-uppercase ls-1">Bulk
+                                    Discount</td>
+                                <td class="text-end pe-3 py-1 fw-bold text-success border-bottom">-₹{{ ns.bulk|int }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% if ns.coupon > 0 %}
+                            <tr class="tfoot-row">
+                                <td colspan="4" class="text-end pe-4 py-1 text-success x-small text-uppercase ls-1">
+                                    Coupon code</td>
+                                <td class="text-end pe-3 py-1 fw-bold text-success border-bottom">-₹{{ ns.coupon|int }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% if ns.shipping > 0 %}
+                            <tr class="tfoot-row">
+                                <td colspan="4" class="text-end pe-4 py-1 text-muted x-small text-uppercase ls-1">
+                                    Delivery Charges</td>
+                                <td class="text-end pe-3 py-1 fw-bold text-dark border-bottom">+₹{{ ns.shipping|int }}
+                                </td>
+                            </tr>
+                            {% endif %}
+
+                            <tr class="grand-total-row">
+                                <td colspan="4" class="ps-4 py-2 fw-900 text-dark text-uppercase tracking-wider">Total
+                                    Amount</td>
+                                <td class="text-end pe-3 py-2 fw-900 text-dark fs-4">₹{{ grand_total|int }}</td>
+                            </tr>
+
+                            <tr class="tfoot-row">
+                                <td colspan="4" class="text-end pe-4 py-1 text-success small fw-bold">Amount Already
+                                    Paid</td>
+                                <td class="text-end pe-3 py-1 fw-bold text-success">₹{{ total_paid|int }}</td>
+                            </tr>
+                            <tr
+                                class="{% if (grand_total - total_paid) > 0.01 %}payable-row{% else %}payable-row-paid{% endif %}">
+                                <td colspan="4" class="text-end pe-4 py-2 fw-800 text-dark">Amount Payable</td>
+                                <td
+                                    class="text-end pe-3 py-2 fw-900 fs-5 {% if (grand_total - total_paid) > 0.01 %}text-danger{% else %}text-success{% endif %}">
+                                    {% if (grand_total - total_paid) > 0.01 %}
+                                    ₹{{ (grand_total - total_paid)|int }}
+                                    {% else %}
+                                    <i class="fas fa-check-circle me-1"></i> PAID
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Business Details -->
+            <div class="row mt-3 pt-2 reveal order-footer-info border-top">
+                <div class="col-md-6">
+                    <p class="x-small text-muted mb-0"><strong>Support:</strong> yuki28@gmail.com |
+                        <strong>Yuki</strong>
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                    <p class="x-small text-muted mb-0">Computer generated invoice. Signature not required.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -18,13 +18,12 @@
         </div>
 
         <div class="row g-4 mb-5 row-cols-1 row-cols-md-2 row-cols-xl-5">
-
             <div class="col">
                 <div class="card border-0 shadow-sm rounded-4 h-100">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
                         <div>
                             <p class="text-muted fw-bold text-uppercase small mb-1">Total Orders</p>
-                            <h3 class="fw-bold mb-0">{{ orders|length }}</h3>
+                            <h3 class="fw-bold mb-0" id="statTotalOrders">{{ orders|length }}</h3>
                         </div>
                         <div class="icon-square bg-primary bg-opacity-10 text-primary rounded-circle">
                             <i class="fas fa-shopping-bag"></i>
@@ -32,7 +31,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col">
                 <div class="card border-0 shadow-sm rounded-4 h-100">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
@@ -46,7 +44,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col">
                 <div class="card border-0 shadow-sm rounded-4 h-100">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
@@ -60,7 +57,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col">
                 <div class="card border-0 shadow-sm rounded-4 h-100">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
@@ -78,7 +74,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col">
                 <div class="card border-0 shadow-sm rounded-4 h-100">
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
@@ -94,12 +89,11 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
             <div class="card-header bg-white p-1 border-0">
-                <ul class="nav nav-pills nav-fill" id="adminTabs" role="tablist">
+                <ul class="nav nav-pills nav-fill flex-column flex-md-row" id="adminTabs" role="tablist">
                     <li class="nav-item">
                         <button class="nav-link fw-bold py-3 active rounded-4" id="orders-tab" data-bs-toggle="tab"
                             data-bs-target="#orders" type="button">
@@ -115,7 +109,19 @@
                     <li class="nav-item">
                         <button class="nav-link fw-bold py-3 rounded-4" id="website-tab" data-bs-toggle="tab"
                             data-bs-target="#website" type="button">
-                            <i class="fas fa-images me-2"></i>Home Carousel
+                            <i class="fas fa-cogs me-2"></i>Website Settings
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold py-3 rounded-4" id="coupons-tab" data-bs-toggle="tab"
+                            data-bs-target="#coupons" type="button">
+                            <i class="fas fa-ticket-alt me-2"></i>Coupons
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold py-3 rounded-4" id="categories-tab" data-bs-toggle="tab"
+                            data-bs-target="#categories" type="button">
+                            <i class="fas fa-th-large me-2"></i>Categories
                         </button>
                     </li>
                 </ul>
@@ -126,9 +132,52 @@
 
             <div class="tab-pane fade show active" id="orders" role="tabpanel">
                 <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-header bg-white p-3 border-bottom">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i
+                                            class="fas fa-search text-muted"></i></span>
+                                    <input type="text" id="searchInput"
+                                        class="form-control border-start-0 shadow-none ps-0"
+                                        placeholder="Search ID, Name, Phone..." onkeyup="filterOrders()">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="statusFilter" class="form-select shadow-none text-muted"
+                                    onchange="filterOrders()">
+                                    <option value="all">All Statuses</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Out for Delivery">Out for Delivery</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="dateFilter" class="form-select shadow-none text-muted"
+                                    onchange="filterOrders()">
+                                    <option value="all">All Dates</option>
+                                    <option value="today">Today</option>
+                                    <option value="yesterday">Yesterday</option>
+                                    <option value="weekly">This Week</option>
+                                    <option value="monthly">This Month</option>
+                                    <option value="yearly">This Year</option>
+                                </select>
+                            </div>
+                            <div class="col-auto ms-auto">
+                                <button class="btn btn-light border" onclick="resetFilters()" title="Reset Filters">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0" id="ordersTable">
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="ps-4 py-3 text-muted text-uppercase small fw-bold">Txn ID</th>
@@ -142,58 +191,109 @@
                                 </thead>
                                 <tbody>
                                     {% for order in orders %}
-                                    <tr>
-                                        <td class="ps-4 fw-bold">#{{ order.transaction_id }}</td>
-                                        <td>
+                                    <tr class="order-row" data-status="{{ order.status }}"
+                                        data-date="{{ order.date_ordered }}">
+                                        <td class="ps-4 fw-bold search-id">
+                                            #{{ order.transaction_id }}
+                                            <div class="small text-muted fw-normal">{{
+                                                order.date_ordered.strftime('%Y-%m-%d') }}</div>
+                                        </td>
+                                        <td class="search-customer">
                                             <div class="fw-bold">{{ order.full_name }}</div>
                                             <div class="small text-muted">{{ order.mobile_number }}</div>
                                         </td>
                                         <td>
                                             {% if order.product %}
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ url_for('static', filename='uploads/' + order.product.image_file) }}"
+                                                <img src="{{ url_for('static', filename='images/' + order.product.image_file) }}"
                                                     width="40" class="rounded me-2">
                                                 <div>
                                                     <div class="fw-bold small">{{ order.product.name }}</div>
                                                     <div class="text-muted small">Qty: {{ order.quantity }} | {{
                                                         order.size }}</div>
+                                                    {% if order.customization_file %}
+                                                    <a href="{{ url_for('static', filename='images/' + order.customization_file) }}"
+                                                        class="badge bg-info bg-opacity-10 text-info border border-info text-decoration-none mt-1"
+                                                        download>
+                                                        <i class="fas fa-cloud-download-alt me-1"></i> User File
+                                                    </a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             {% else %}
-                                            <div class="text-danger small fw-bold">
-                                                <i class="fas fa-exclamation-circle"></i> Product Deleted
-                                            </div>
-                                            <div class="text-muted small">Qty: {{ order.quantity }}</div>
+                                            <div class="text-danger small fw-bold"><i
+                                                    class="fas fa-exclamation-circle"></i> Deleted</div>
                                             {% endif %}
                                         </td>
                                         <td>₹{{ order.total_price }}</td>
-                                        <td><span class="badge bg-light text-dark border">{{ order.status }}</span></td>
+                                        <td>
+                                            {% set badge_color = 'bg-secondary' %}
+                                            {% if order.status == 'Pending' %}{% set badge_color = 'bg-warning
+                                            text-dark' %}
+                                            {% elif order.status == 'Processing' %}{% set badge_color = 'bg-info
+                                            text-dark' %}
+                                            {% elif order.status == 'Shipped' %}{% set badge_color = 'bg-primary' %}
+                                            {% elif order.status == 'Out for Delivery' %}{% set badge_color =
+                                            'bg-purple' %}
+                                            {% elif order.status == 'Delivered' %}{% set badge_color = 'bg-success' %}
+                                            {% elif order.status == 'Cancelled' %}{% set badge_color = 'bg-danger' %}
+                                            {% endif %}
+                                            <span class="badge {{ badge_color }} border bg-opacity-75">{{ order.status
+                                                }}</span>
+                                        </td>
                                         <td class="pe-4 text-end">
-                                            <div class="d-flex justify-content-end gap-2">
-                                                <a href="{{ url_for('admin_bp.view_order', order_id=order.id) }}"
-                                                    class="btn btn-light btn-sm border" title="View Receipt">
+                                            <div class="d-flex justify-content-end gap-2 align-items-center">
+
+                                                <a href="{{ url_for('admin_bp.view_order', txn_id=order.transaction_id) }}"
+                                                    class="btn btn-light btn-sm border shadow-sm" title="View Details">
                                                     <i class="fas fa-eye text-primary"></i>
                                                 </a>
+
+                                                <a href="{{ url_for('user_bp.generate_invoice', txn_id=order.transaction_id) }}"
+                                                    target="_blank" class="btn btn-light btn-sm border shadow-sm"
+                                                    title="Download Invoice">
+                                                    <i class="fas fa-file-invoice-dollar text-success"></i>
+                                                </a>
+
                                                 <form action="{{ url_for('admin_bp.update_order', order_id=order.id) }}"
                                                     method="POST">
-                                                    <select name="status" class="form-select form-select-sm"
-                                                        style="width: 130px;" onchange="this.form.submit()">
+                                                    <select name="status"
+                                                        class="form-select form-select-sm shadow-sm border"
+                                                        style="width: 135px;" onchange="this.form.submit()">
                                                         <option value="Pending" {% if order.status=='Pending'
                                                             %}selected{% endif %}>Pending</option>
                                                         <option value="Processing" {% if order.status=='Processing'
                                                             %}selected{% endif %}>Processing</option>
                                                         <option value="Shipped" {% if order.status=='Shipped'
                                                             %}selected{% endif %}>Shipped</option>
+                                                        <option value="Out for Delivery" {% if
+                                                            order.status=='Out for Delivery' %}selected{% endif %}>Out
+                                                            for Delivery</option>
                                                         <option value="Delivered" {% if order.status=='Delivered'
                                                             %}selected{% endif %}>Delivered</option>
+                                                        <option value="Cancelled" {% if order.status=='Cancelled'
+                                                            %}selected{% endif %}>Cancelled</option>
                                                     </select>
                                                 </form>
+
+                                                {% if order.status != 'Cancelled' and order.status != 'Delivered' %}
+                                                <form action="{{ url_for('admin_bp.update_order', order_id=order.id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Are you sure you want to CANCEL Order #{{ order.transaction_id }}?');">
+                                                    <input type="hidden" name="status" value="Cancelled">
+                                                    <button type="submit" class="btn btn-danger btn-sm shadow-sm"
+                                                        title="Cancel Order">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+
                                             </div>
                                         </td>
                                     </tr>
                                     {% else %}
-                                    <tr>
-                                        <td colspan="6" class="text-center py-4">No orders yet.</td>
+                                    <tr id="noOrdersRow">
+                                        <td colspan="6" class="text-center py-4">No orders found.</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -207,16 +307,16 @@
                 <div class="row g-4">
                     {% for product in products %}
                     <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-0 shadow-sm rounded-4">
-                            <div class="position-relative">
-                                <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
-                                    class="card-img-top p-3 rounded-5" style="height: 200px; object-fit: contain;">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="position-relative bg-light text-center"
+                                style="aspect-ratio: 1 / 1; max-height: 250px;">
+                                <img src="{{ url_for('static', filename='images/' + product.image_file) }}"
+                                    class="w-100 h-100 p-3" style="object-fit: contain;">
                                 <span class="position-absolute top-0 start-0 m-3 badge bg-dark shadow-sm">{{
                                     product.section }}</span>
                                 <span
-                                    class="position-absolute bottom-0 end-0 m-3 badge {{ 'bg-success' if product.stock > 0 else 'bg-danger' }} shadow-sm">
-                                    Stock: {{ product.stock }}
-                                </span>
+                                    class="position-absolute bottom-0 end-0 m-3 badge {{ 'bg-success' if product.stock > 0 else 'bg-danger' }} shadow-sm">Stock:
+                                    {{ product.stock }}</span>
                             </div>
                             <div class="card-body">
                                 <h6 class="fw-bold mb-1 text-truncate">{{ product.name }}</h6>
@@ -225,8 +325,8 @@
                                     <button class="btn btn-light btn-sm flex-grow-1 fw-bold" data-bs-toggle="modal"
                                         data-bs-target="#editModal{{ product.id }}">Edit</button>
                                     <a href="{{ url_for('admin_bp.delete_product', product_id=product.id) }}"
-                                        class="btn btn-light btn-sm text-danger" onclick="return confirm('Delete?')">
-                                        <i class="fas fa-trash"></i>
+                                        class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">
+                                        <i class="fa fa-trash"></i>
                                     </a>
                                 </div>
                             </div>
@@ -242,25 +342,28 @@
                                     <div class="modal-body">
                                         <form action="{{ url_for('admin_bp.edit_product', product_id=product.id) }}"
                                             method="POST" enctype="multipart/form-data">
-
-                                            <div class="mb-3">
-                                                <label class="small fw-bold">Category</label>
-                                                <input type="text" name="section" class="form-control"
-                                                    list="section_list" value="{{ product.section }}" required>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-6">
+                                                    <label class="small fw-bold">Category</label>
+                                                    <input type="text" name="section" class="form-control"
+                                                        list="section_list" value="{{ product.section }}" required>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="small fw-bold">Style / Type</label>
+                                                    <input type="text" name="category" class="form-control"
+                                                        value="{{ product.category }}" required>
+                                                </div>
                                             </div>
-
-                                            <div class="mb-3">
-                                                <label class="small fw-bold">Style / Type</label>
-                                                <input type="text" name="category" class="form-control"
-                                                    value="{{ product.category }}" required>
-                                            </div>
-
                                             <div class="form-floating mb-3">
                                                 <input type="text" name="name" class="form-control"
                                                     value="{{ product.name }}" required>
                                                 <label>Product Name</label>
                                             </div>
-
+                                            <div class="mb-3">
+                                                <label class="small fw-bold">Description</label>
+                                                <textarea name="description" class="form-control"
+                                                    rows="3">{{ product.description if product.description else '' }}</textarea>
+                                            </div>
                                             <div class="row g-2 mb-3">
                                                 <div class="col-4 form-floating">
                                                     <input type="number" name="price" step="0.01" class="form-control"
@@ -278,49 +381,70 @@
                                                     <label>Stock</label>
                                                 </div>
                                             </div>
-
-                                            <div class="mb-3 p-2 border rounded bg-white">
-                                                <label class="small fw-bold d-block mb-2">Main Image</label>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="{{ url_for('static', filename='uploads/' + product.image_file) }}"
-                                                        class="rounded border me-3"
-                                                        style="width: 60px; height: 60px; object-fit: cover;">
-                                                    <div class="flex-grow-1">
-                                                        <input type="file" name="image"
-                                                            class="form-control form-control-sm">
-                                                    </div>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-4 form-floating">
+                                                    <input type="number" name="bulk_min_qty" class="form-control"
+                                                        value="{{ product.bulk_min_qty or 0 }}">
+                                                    <label>Bulk Qty</label>
+                                                </div>
+                                                <div class="col-4 form-floating">
+                                                    <input type="number" name="bulk_discount_percentage" step="0.01"
+                                                        class="form-control"
+                                                        value="{{ product.bulk_discount_percentage or 0.0 }}">
+                                                    <label>Bulk %</label>
+                                                </div>
+                                                <div class="col-4 form-floating">
+                                                    <input type="number" name="advance_percentage" step="0.1"
+                                                        class="form-control"
+                                                        value="{{ product.advance_percentage or 40.0 }}" required>
+                                                    <label>Adv %</label>
                                                 </div>
                                             </div>
-
+                                            <div class="mb-3 p-2 border rounded bg-white">
+                                                <label class="small fw-bold d-block mb-2">Main Image</label>
+                                                <small class="d-block text-muted mb-2"
+                                                    style="font-size: 0.75rem;">Optimal resolution: 800x800 pixels (1:1
+                                                    ratio). Max 20MB</small>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="{{ url_for('static', filename='images/' + product.image_file) }}"
+                                                        class="rounded border me-3"
+                                                        style="width: 60px; height: 60px; object-fit: cover;">
+                                                    <div class="flex-grow-1"><input type="file" name="image"
+                                                            class="form-control form-control-sm" accept="image/*"></div>
+                                                </div>
+                                            </div>
                                             <div class="mb-3">
                                                 <label class="small fw-bold">Add Gallery Photos</label>
-                                                <input type="file" name="gallery_images" class="form-control" multiple>
+                                                <small class="d-block text-muted mb-2"
+                                                    style="font-size: 0.75rem;">Optimal resolution: 800x800 pixels (1:1
+                                                    ratio). Max 20MB per file</small>
+                                                <input type="file" name="gallery_images" class="form-control"
+                                                    accept="image/*" multiple>
                                             </div>
-
                                             {% if product.images %}
                                             <div class="mb-3 p-2 bg-light rounded">
                                                 <div class="d-flex gap-2 flex-wrap">
                                                     {% for img in product.images %}
                                                     <div class="position-relative">
-                                                        <img src="{{ url_for('static', filename='uploads/' + img.image_file) }}"
+                                                        <img src="{{ url_for('static', filename='images/' + img.image_file) }}"
                                                             class="rounded border"
                                                             style="width: 50px; height: 50px; object-fit: cover;">
                                                         <a href="{{ url_for('admin_bp.delete_product_image', image_id=img.id) }}"
-                                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-decoration-none shadow-sm"
+                                                            class="position-absolute top-0 start-100 translate-middle btn btn-danger"
                                                             onclick="return confirm('Remove photo?')"
-                                                            style="cursor: pointer;">&times;</a>
+                                                            style="width: 24px; height: 24px; line-height: 14px; padding: 0;">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
                                                     </div>
                                                     {% endfor %}
                                                 </div>
                                             </div>
                                             {% endif %}
-
                                             <div class="mb-3">
                                                 <label class="small fw-bold">Sizes</label>
                                                 <input type="text" name="sizes" class="form-control"
                                                     value="{{ product.sizes }}">
                                             </div>
-
                                             <div class="d-grid">
                                                 <button type="submit"
                                                     class="btn btn-primary rounded-pill fw-bold">Update Product</button>
@@ -339,54 +463,349 @@
                 <div class="row g-4">
                     <div class="col-md-4">
                         <div class="card border-0 shadow-sm rounded-4 h-100">
-                            <div class="card-body p-4">
-                                <h5 class="fw-bold mb-3">Add Banner</h5>
-                                <form action="{{ url_for('admin_bp.add_banner') }}" method="POST"
+                            <div class="card-body p-4 text-center">
+                                <div class="icon-square bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-3"
+                                    style="width: 60px; height: 60px;">
+                                    <i class="fas fa-qrcode fa-lg"></i>
+                                </div>
+                                <h5 class="fw-bold mb-3">Payment QR</h5>
+                                <p class="text-muted small mb-4">Upload your UPI QR code for checkout.</p>
+
+                                {% if site_setting and site_setting.qr_code_file %}
+                                <div class="mb-3 p-3 bg-light rounded border position-relative">
+                                    <img src="{{ url_for('static', filename='images/' + site_setting.qr_code_file) }}"
+                                        class="img-fluid rounded shadow-sm" style="max-height: 180px;">
+                                    <div class="mt-2 text-success small fw-bold"><i
+                                            class="fas fa-check-circle me-1"></i> Active</div>
+                                    <a href="{{ url_for('admin_bp.delete_qr') }}"
+                                        class="position-absolute top-0 end-0 m-2 btn btn-danger"
+                                        style="width: 24px; height: 24px; line-height: 14px; padding: 0;"
+                                        onclick="return confirm('Remove this QR Code?')" title="Remove QR">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
+
+                                <form action="{{ url_for('admin_bp.upload_qr') }}" method="POST"
                                     enctype="multipart/form-data">
-                                    <div class="mb-3">
-                                        <label class="small fw-bold">Title</label>
-                                        <input type="text" name="title" class="form-control" placeholder="Summer Sale"
+                                    <div class="mb-3 text-start">
+                                        <label class="small fw-bold">Upload New QR</label>
+                                        <small class="d-block text-muted mb-2" style="font-size: 0.75rem;">Max Size:
+                                            20MB</small>
+                                        <input type="file" name="qr_image" class="form-control" accept="image/*"
                                             required>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="small fw-bold">Subtitle</label>
-                                        <input type="text" name="subtitle" class="form-control"
-                                            placeholder="Up to 50% off">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="small fw-bold">Image</label>
-                                        <input type="file" name="image" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="small fw-bold">Button Link</label>
-                                        <input type="text" name="link" class="form-control" placeholder="#">
-                                    </div>
                                     <div class="d-grid">
-                                        <button type="submit" class="btn btn-dark rounded-pill fw-bold">Upload
-                                            Banner</button>
+                                        <button type="submit" class="btn btn-primary rounded-pill fw-bold">Save QR
+                                            Code</button>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-8">
-                        <div class="row g-3">
-                            {% for banner in banners %}
-                            <div class="col-md-6">
-                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                                    <img src="{{ url_for('static', filename='uploads/' + banner.image_file) }}"
-                                        class="card-img-top" style="height: 150px; object-fit: cover;">
-                                    <div class="card-body">
-                                        <h6 class="fw-bold">{{ banner.title }}</h6>
-                                        <p class="small text-muted mb-3">{{ banner.subtitle }}</p>
-                                        <a href="{{ url_for('admin_bp.delete_banner', banner_id=banner.id) }}"
-                                            class="btn btn-danger btn-sm w-100 rounded-pill">Delete Banner</a>
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-white p-4 border-bottom-0 pb-0">
+                                <h5 class="fw-bold mb-0"><i class="fas fa-images me-2 text-primary"></i>Homepage Banners
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-4">
+                                    <div class="col-lg-5 border-end">
+                                        <h6 class="fw-bold small text-uppercase text-muted mb-3">Add New Banner</h6>
+                                        <form action="{{ url_for('admin_bp.add_banner') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            <div class="mb-3">
+                                                <label class="small fw-bold">Title</label>
+                                                <input type="text" name="title" class="form-control form-control-sm"
+                                                    placeholder="e.g., Summer Sale" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="small fw-bold">Subtitle</label>
+                                                <input type="text" name="subtitle" class="form-control form-control-sm"
+                                                    placeholder="e.g., Flat 50% Off">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="small fw-bold">Banner Image</label>
+                                                <small class="d-block text-muted mb-2"
+                                                    style="font-size: 0.75rem;">Optimal resolution: 1920x600 pixels
+                                                    (16:5 ratio). Max 20MB</small>
+                                                <input type="file" name="image" id="bannerInput"
+                                                    class="form-control form-control-sm" accept="image/*" required
+                                                    onchange="previewImage(this, 'bannerPreview')">
+                                                <div id="bannerPreview"
+                                                    class="mt-2 d-none rounded overflow-hidden border">
+                                                    <img src="" class="w-100" style="height: 100px; object-fit: cover;">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="small fw-bold">Button Link</label>
+                                                <input type="text" name="link" class="form-control form-control-sm"
+                                                    placeholder="#">
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit"
+                                                    class="btn btn-dark btn-sm rounded-pill fw-bold">Upload
+                                                    Banner</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col-lg-7">
+                                        <h6 class="fw-bold small text-uppercase text-muted mb-3">Active Banners</h6>
+                                        <div class="row g-3">
+                                            {% for banner in banners %}
+                                            <div class="col-12">
+                                                <div
+                                                    class="card border shadow-sm rounded-3 overflow-hidden position-relative group-action">
+                                                    <img src="{{ url_for('static', filename='images/' + banner.image_file) }}"
+                                                        class="card-img-top w-100"
+                                                        style="height: 120px; object-fit: cover;">
+                                                    <div
+                                                        class="card-body p-2 d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h6 class="fw-bold small mb-0">{{ banner.title }}</h6>
+                                                            <p class="x-small text-muted mb-0">{{ banner.subtitle }}</p>
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            <button
+                                                                class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                                                style="width: 30px; height: 30px; padding: 0;"
+                                                                title="Edit Banner" data-bs-toggle="modal"
+                                                                data-bs-target="#editBannerModal{{ banner.id }}">
+                                                                <i class="fas fa-pen" style="font-size: 12px;"></i>
+                                                            </button>
+                                                            <a href="{{ url_for('admin_bp.delete_banner', banner_id=banner.id) }}"
+                                                                class="btn btn-danger btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                                                style="width: 30px; height: 30px; padding: 0;"
+                                                                title="Delete Banner"
+                                                                onclick="return confirm('Delete this banner?')">
+                                                                <i class="fa fa-trash" style="font-size: 12px;"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            {% else %}
+                                            <div class="col-12 text-center py-4 text-muted small">No banners active. Add
+                                                one to display on homepage.</div>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            {% else %}
-                            <div class="col-12 text-center py-5 text-muted">No banners uploaded.</div>
-                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COUPONS TAB PANE -->
+            <div class="tab-pane fade" id="coupons" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="icon-square bg-success bg-opacity-10 text-success rounded-circle mx-auto mb-3"
+                                    style="width: 60px; height: 60px;">
+                                    <i class="fas fa-ticket-alt fa-lg"></i>
+                                </div>
+                                <h5 class="fw-bold mb-3">Add Discount Coupon</h5>
+                                <p class="text-muted small mb-4">Create a new coupon code to offer discounts.</p>
+                                <form action="{{ url_for('admin_bp.add_coupon') }}" method="POST">
+                                    <div class="mb-3 text-start">
+                                        <label class="small fw-bold">Coupon Code</label>
+                                        <input type="text" name="code" class="form-control text-uppercase"
+                                            placeholder="e.g. WELCOME10" required>
+                                    </div>
+                                    <div class="mb-3 text-start">
+                                        <label class="small fw-bold">Discount Percentage (%)</label>
+                                        <input type="number" name="discount_percentage" step="0.01" class="form-control"
+                                            placeholder="10" required>
+                                    </div>
+                                    <div class="mb-4 text-start">
+                                        <label class="small fw-bold">Applicable Category</label>
+                                        <input type="text" name="applicable_category" class="form-control"
+                                            list="coupon_category_list" placeholder="e.g. T-Shirts or 'All'" value="All"
+                                            required>
+                                        <datalist id="coupon_category_list">
+                                            <option value="All">
+                                            <option value="T-Shirts">
+                                            <option value="Hoodies">
+                                            <option value="Mugs">
+                                            <option value="Cards">
+                                            <option value="Bottles">
+                                            <option value="Pillows">
+                                            <option value="Posters">
+                                        </datalist>
+                                        <small class="text-muted d-block mt-1">Set to 'All' for all categories.</small>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success rounded-pill fw-bold">Create
+                                            Coupon</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-white p-4 border-bottom-0 pb-0">
+                                <h5 class="fw-bold mb-0"><i class="fas fa-list me-2 text-primary"></i>Manage Coupons
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="ps-4 py-3 text-muted text-uppercase small fw-bold">Code</th>
+                                                <th class="py-3 text-muted text-uppercase small fw-bold">Discount</th>
+                                                <th class="py-3 text-muted text-uppercase small fw-bold">Category</th>
+                                                <th class="py-3 text-muted text-uppercase small fw-bold">Status</th>
+                                                <th class="pe-4 py-3 text-muted text-uppercase small fw-bold text-end">
+                                                    Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for coupon in coupons %}
+                                            <tr>
+                                                <td class="ps-4 fw-bold text-uppercase">{{ coupon.code }}</td>
+                                                <td><span
+                                                        class="badge bg-success bg-opacity-10 text-success border border-success">{{
+                                                        coupon.discount_percentage }}% OFF</span></td>
+                                                <td class="small fw-bold">{{ coupon.applicable_category }}</td>
+                                                <td>
+                                                    {% if coupon.is_active %}
+                                                    <span class="badge bg-primary">Active</span>
+                                                    {% else %}
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="pe-4 text-end">
+                                                    <div class="d-flex justify-content-end gap-2 align-items-center">
+                                                        <form
+                                                            action="{{ url_for('admin_bp.toggle_coupon_status', coupon_id=coupon.id) }}"
+                                                            method="POST">
+                                                            <button type="submit"
+                                                                class="btn btn-sm {% if coupon.is_active %}btn-warning{% else %}btn-success{% endif %} shadow-sm text-dark px-2"
+                                                                title="Toggle Status">
+                                                                {% if coupon.is_active %}Deactivate{% else %}Activate{%
+                                                                endif %}
+                                                            </button>
+                                                        </form>
+                                                        <form
+                                                            action="{{ url_for('admin_bp.delete_coupon', coupon_id=coupon.id) }}"
+                                                            method="POST"
+                                                            onsubmit="return confirm('Delete coupon {{ coupon.code }}?');">
+                                                            <button type="submit"
+                                                                class="btn btn-danger btn-sm shadow-sm"
+                                                                title="Delete Coupon">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% else %}
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4 text-muted small">No coupons
+                                                    created.</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORIES TAB PANE -->
+            <div class="tab-pane fade" id="categories" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="icon-square bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-3"
+                                    style="width: 60px; height: 60px;">
+                                    <i class="fas fa-layer-group fa-lg"></i>
+                                </div>
+                                <h5 class="fw-bold mb-3">Add Category Icon</h5>
+                                <p class="text-muted small mb-4">Upload custom icons/images for front-end categories.
+                                </p>
+                                <form action="{{ url_for('admin_bp.add_category') }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    <div class="mb-3 text-start">
+                                        <label class="small fw-bold">Category Name</label>
+                                        <input type="text" name="name" class="form-control" list="section_list_cat"
+                                            placeholder="e.g. T-Shirts" required>
+                                        <datalist id="section_list_cat">
+                                            <option value="T-Shirts">
+                                            <option value="Hoodies">
+                                            <option value="Mugs">
+                                            <option value="Cards">
+                                            <option value="Bottles">
+                                            <option value="Pillows">
+                                            <option value="Posters">
+                                        </datalist>
+                                        <small class="text-muted d-block mt-1">Must match the product 'Section' name
+                                            exactly.</small>
+                                    </div>
+                                    <div class="mb-4 text-start">
+                                        <label class="small fw-bold">Category Icon / Image</label>
+                                        <small class="d-block text-muted mb-2" style="font-size: 0.75rem;">Optimal
+                                            resolution: 400x300 pixels (4:3 ratio). Max 20MB</small>
+                                        <input type="file" name="image" class="form-control" accept="image/*" required>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit"
+                                            class="btn btn-warning text-dark border-warning rounded-pill fw-bold">Save
+                                            Category</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-white p-4 border-bottom-0 pb-0">
+                                <h5 class="fw-bold mb-0"><i class="fas fa-th-large me-2 text-primary"></i>Manage
+                                    Category Icons
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    {% for category in categories %}
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div
+                                            class="card border shadow-sm rounded-3 overflow-hidden text-center position-relative">
+                                            <div class="p-3 bg-light"
+                                                style="aspect-ratio: 1/1; display:flex; align-items:center; justify-content:center;">
+                                                <img src="{{ url_for('static', filename='images/' + category.image_file) }}"
+                                                    class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                                            </div>
+                                            <div class="card-body p-2">
+                                                <h6 class="fw-bold small mb-0 text-truncate">{{ category.name }}</h6>
+                                            </div>
+                                            <a href="{{ url_for('admin_bp.delete_category', category_id=category.id) }}"
+                                                class="btn btn-danger btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 30px; height: 30px; padding: 0;" title="Delete Category"
+                                                onclick="return confirm('Delete icon for {{ category.name }}?')">
+                                                <i class="fa fa-trash" style="font-size: 12px;"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-12 text-center py-4 text-muted small">No custom category icons
+                                        created yet.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -395,6 +814,50 @@
         </div>
     </div>
 </div>
+
+<!-- Banner Edit Modals (Moved outside to prevent blinking and z-index issues) -->
+{% for banner in banners %}
+<div class="modal fade" id="editBannerModal{{ banner.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Edit Banner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('admin_bp.edit_banner', banner_id=banner.id) }}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="small fw-bold">Title</label>
+                        <input type="text" name="title" class="form-control form-control-sm" value="{{ banner.title }}"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">Subtitle</label>
+                        <input type="text" name="subtitle" class="form-control form-control-sm"
+                            value="{{ banner.subtitle if banner.subtitle else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold d-block mb-2">Current Image</label>
+                        <img src="{{ url_for('static', filename='images/' + banner.image_file) }}"
+                            class="rounded border mb-2 w-100" style="height: 100px; object-fit: cover;">
+                        <label class="small fw-bold">Change Image (Optional) - Max 20MB</label>
+                        <input type="file" name="image" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">Button Link</label>
+                        <input type="text" name="link" class="form-control form-control-sm"
+                            value="{{ banner.link if banner.link else '' }}">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-sm rounded-pill fw-bold">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 <div class="modal fade" id="addProductModal" tabindex="-1">
     <div class="modal-dialog">
@@ -412,9 +875,9 @@
 
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label class="small fw-bold">Category</label>
+                            <label class="small fw-bold">Category (Section)</label>
                             <input type="text" name="section" class="form-control" list="section_list"
-                                placeholder="Select or Type..." required>
+                                placeholder="e.g. T-Shirts" required>
                             <datalist id="section_list">
                                 <option value="T-Shirts">
                                 <option value="Hoodies">
@@ -426,9 +889,16 @@
                             </datalist>
                         </div>
                         <div class="col-6">
-                            <label class="small fw-bold">Style / Type</label>
-                            <input type="text" name="category" class="form-control" value="Standard" required>
+                            <label class="small fw-bold">Style (Type)</label>
+                            <input type="text" name="category" class="form-control" placeholder="e.g. Oversized"
+                                value="Standard" required>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold">Product Description</label>
+                        <textarea name="description" class="form-control" rows="3"
+                            placeholder="Enter product details..."></textarea>
                     </div>
 
                     <div class="row g-2 mb-3">
@@ -446,23 +916,44 @@
                             <label>Stock</label>
                         </div>
                     </div>
-
+                    <div class="row g-2 mb-3">
+                        <div class="col-4 form-floating">
+                            <input type="number" name="bulk_min_qty" class="form-control" value="0">
+                            <label>Bulk Qty</label>
+                        </div>
+                        <div class="col-4 form-floating">
+                            <input type="number" name="bulk_discount_percentage" step="0.01" class="form-control"
+                                value="0.0">
+                            <label>Bulk %</label>
+                        </div>
+                        <div class="col-4 form-floating">
+                            <input type="number" name="advance_percentage" step="0.1" class="form-control" value="40.0"
+                                required>
+                            <label>Adv %</label>
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label class="small fw-bold">Main Image</label>
-                        <input type="file" name="image" class="form-control" required>
+                        <small class="d-block text-muted mb-2" style="font-size: 0.75rem;">Optimal resolution: 800x800
+                            pixels (1:1 ratio). Max 20MB</small>
+                        <input type="file" name="image" class="form-control" accept="image/*" required
+                            onchange="previewImage(this, 'addProductPreview')">
+                        <div id="addProductPreview"
+                            class="mt-2 d-none rounded border bg-light d-flex align-items-center justify-content-center"
+                            style="height: 150px;">
+                            <img src="" class="h-100 w-100" style="object-fit: contain;">
+                        </div>
                     </div>
-
                     <div class="mb-3">
                         <label class="small fw-bold">Additional Gallery Photos</label>
-                        <input type="file" name="gallery_images" class="form-control" multiple>
-                        <div class="form-text small">Hold Ctrl/Cmd to select multiple files.</div>
+                        <small class="d-block text-muted mb-2" style="font-size: 0.75rem;">Optimal resolution: 800x800
+                            pixels (1:1 ratio). Max 20MB per file</small>
+                        <input type="file" name="gallery_images" class="form-control" accept="image/*" multiple>
                     </div>
-
                     <div class="mb-3">
                         <label class="small fw-bold">Sizes (comma separated)</label>
                         <input type="text" name="sizes" class="form-control" placeholder="S, M, L, XL">
                     </div>
-
                     <div class="d-grid pt-2">
                         <button type="submit" class="btn btn-primary rounded-pill fw-bold">Create Product</button>
                     </div>
@@ -472,24 +963,106 @@
     </div>
 </div>
 
-<style>
-    .icon-square {
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+
+
+<script>
+    // New Function for Image Previews (Auto Adjusts in Modal)
+    function previewImage(input, previewId) {
+        const previewContainer = document.getElementById(previewId);
+        const previewImg = previewContainer.querySelector('img');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImg.src = e.target.result;
+                previewContainer.classList.remove('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewImg.src = "";
+            previewContainer.classList.add('d-none');
+        }
     }
 
-    .hover-scale:hover {
-        transform: scale(1.05);
-        transition: transform 0.2s;
+    function filterOrders() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const dateFilter = document.getElementById('dateFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const rows = document.querySelectorAll('.order-row');
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+            const rowDateStr = row.getAttribute('data-date');
+            const rowDate = new Date(rowDateStr.replace(/-/g, '/'));
+            rowDate.setHours(0, 0, 0, 0);
+
+            // --- 1. SEARCH LOGIC ---
+            const idText = row.querySelector('.search-id').innerText.toLowerCase();
+            const customerText = row.querySelector('.search-customer').innerText.toLowerCase();
+
+            let searchMatch = true;
+            if (searchText !== "") {
+                if (!idText.includes(searchText) && !customerText.includes(searchText)) {
+                    searchMatch = false;
+                }
+            }
+
+            // --- 2. FILTER LOGIC ---
+            let statusMatch = false;
+            if (statusFilter === 'all' || rowStatus === statusFilter) {
+                statusMatch = true;
+            }
+
+            let dateMatch = false;
+            if (dateFilter === 'all') {
+                dateMatch = true;
+            } else if (dateFilter === 'today') {
+                dateMatch = rowDate.getTime() === today.getTime();
+            } else if (dateFilter === 'yesterday') {
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+                dateMatch = rowDate.getTime() === yesterday.getTime();
+            } else if (dateFilter === 'weekly') {
+                const lastWeek = new Date(today);
+                lastWeek.setDate(today.getDate() - 7);
+                dateMatch = rowDate >= lastWeek;
+            } else if (dateFilter === 'monthly') {
+                dateMatch = (rowDate.getMonth() === today.getMonth() && rowDate.getFullYear() === today.getFullYear());
+            } else if (dateFilter === 'yearly') {
+                dateMatch = rowDate.getFullYear() === today.getFullYear();
+            }
+
+            // --- 3. COMBINE ALL CONDITIONS ---
+            if (searchMatch && dateMatch && statusMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     }
 
-    .nav-pills .nav-link.active {
-        background-color: #0df9fd;
-        color: white;
-        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('dateFilter').value = 'all';
+        document.getElementById('statusFilter').value = 'all';
+        filterOrders();
     }
-</style>
+
+    // Generic Admin File Size Validation
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.type === 'file') {
+            const files = e.target.files;
+            for (let file of files) {
+                if (file.size / 1024 / 1024 > 20) {
+                    alert(`File "${file.name}" exceeds 20MB limit. Please upload a smaller file.`);
+                    e.target.value = "";
+                    break;
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

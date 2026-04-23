@@ -4,203 +4,11 @@
 
 {% block content %}
 
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-    :root {
-        --font-main: 'Plus Jakarta Sans', sans-serif;
-        --color-accent: #111827;
-        --color-primary: #3b82f6;
-        --bg-body: #f3f4f6;
-        --border-color: #e5e7eb;
-        --card-radius: 16px;
-    }
 
-    body {
-        font-family: var(--font-main);
-        background-color: var(--bg-body);
-        color: #374151;
-    }
-
-    /* --- Utilities --- */
-    .fw-600 {
-        font-weight: 600;
-    }
-
-    .fw-700 {
-        font-weight: 700;
-    }
-
-    .text-accent {
-        color: var(--color-accent);
-    }
-
-    /* --- Cards --- */
-    .modern-card {
-        background: white;
-        border-radius: var(--card-radius);
-        border: 1px solid white;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-    }
-
-    .modern-card-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        align-items: center;
-        background: #ffffff;
-    }
-
-    .step-number {
-        background: var(--color-accent);
-        color: white;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.85rem;
-        font-weight: 700;
-        margin-right: 1rem;
-    }
-
-    /* --- Form Elements --- */
-    .form-floating>.form-control,
-    .form-floating>.form-select {
-        border: 1px solid var(--border-color);
-        background-color: #f9fafb;
-        border-radius: 10px;
-        font-weight: 500;
-        color: var(--color-accent);
-    }
-
-    .form-floating>.form-control:focus,
-    .form-floating>.form-select:focus {
-        background-color: #ffffff;
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-    }
-
-    .form-floating>label {
-        color: #6b7280;
-    }
-
-    /* --- Upload Zone --- */
-    .upload-zone {
-        border: 2px dashed var(--border-color);
-        border-radius: 12px;
-        background: #f9fafb;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .upload-zone:hover {
-        border-color: var(--color-primary);
-        background: #eff6ff;
-    }
-
-    /* --- Payment Tiles --- */
-    .payment-tile {
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 1.25rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        position: relative;
-        background: white;
-    }
-
-    .payment-tile:hover {
-        border-color: #d1d5db;
-        background: #f9fafb;
-    }
-
-    .payment-tile.active {
-        border: 2px solid var(--color-accent);
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    .payment-tile.active::after {
-        content: '\f00c';
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        background: var(--color-accent);
-        color: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-    }
-
-    /* --- Summary --- */
-    .summary-card {
-        position: sticky;
-        top: 20px;
-        background: white;
-        border-radius: var(--card-radius);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--border-color);
-    }
-
-    /* --- Scrollable List (FIXED) --- */
-    .cart-items-list {
-        max-height: 300px;
-        overflow-y: auto;
-        padding-right: 10px;
-        /* Added padding-top to prevent top badge from being cut off */
-        padding-top: 15px;
-        margin-bottom: 1rem;
-    }
-
-    .cart-items-list::-webkit-scrollbar {
-        width: 5px;
-    }
-
-    .cart-items-list::-webkit-scrollbar-thumb {
-        background: #e5e7eb;
-        border-radius: 10px;
-    }
-
-    .btn-pay {
-        background: var(--color-accent);
-        color: white;
-        width: 100%;
-        padding: 1rem;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        transition: all 0.2s;
-        border: none;
-    }
-
-    .btn-pay:hover {
-        background: black;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-green {
-        background-color: #10b981 !important;
-    }
-
-    .btn-green:hover {
-        background-color: #059669 !important;
-    }
-</style>
-
-<div class="container py-5">
+<div class="container py-3">
     <form method="POST" enctype="multipart/form-data">
-        <div class="row g-5">
+        <div class="row g-4">
 
             <div class="col-lg-7">
 
@@ -209,56 +17,149 @@
                         <div class="step-number">1</div>
                         <h6 class="mb-0 fw-700 text-accent">Shipping Address</h6>
                     </div>
-                    <div class="p-4">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" name="full_name" class="form-control" id="floatingName"
-                                        placeholder="Name" required>
-                                    <label for="floatingName">Full Name</label>
+                    <div class="p-3">
+
+                        {% if current_user.address %}
+                        <!-- Saved Address Selector -->
+                        <div class="mb-3">
+                            <p class="small fw-600 text-muted text-uppercase mb-2" style="letter-spacing: 1px;"><i
+                                    class="fas fa-bookmark me-2 text-accent"></i>Choose Address</p>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="border rounded-3 p-3 cursor-pointer" id="savedAddressCard"
+                                    onclick="useSavedAddress()"
+                                    style="border-left: 3px solid var(--accent-color) !important; background: #f8faff; transition: all 0.2s;">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="form-check mt-1 flex-shrink-0">
+                                            <input class="form-check-input" type="radio" name="address_choice"
+                                                id="saved_addr" value="saved" onclick="useSavedAddress()" checked>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-700 text-dark small mb-1">
+                                                <i class="fas fa-home me-2 text-accent opacity-75"></i>{{
+                                                current_user.full_name }}
+                                                <span class="badge ms-2"
+                                                    style="background: var(--accent-light); color: var(--accent-color); font-size: 0.65rem;">SAVED</span>
+                                            </div>
+                                            <div class="text-muted small lh-base">
+                                                {{ current_user.address }}{% if current_user.city %}, {{
+                                                current_user.city }}{% endif %}{% if current_user.state %}, {{
+                                                current_user.state }}{% endif %}{% if current_user.pincode %} - {{
+                                                current_user.pincode }}{% endif %}
+                                            </div>
+                                            {% if current_user.mobile_number %}
+                                            <div class="text-muted small mt-1"><i
+                                                    class="fas fa-phone-alt me-1 opacity-50"></i>{{
+                                                current_user.mobile_number }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="tel" name="mobile_number" class="form-control" id="floatingMobile"
-                                        placeholder="Phone" maxlength="10" required>
-                                    <label for="floatingMobile">Mobile Number</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input type="text" name="address" class="form-control" id="floatingAddress"
-                                        placeholder="Address" required>
-                                    <label for="floatingAddress">Address (Area and Street)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <input type="text" name="pincode" class="form-control" id="floatingPincode"
-                                        placeholder="Pincode" maxlength="6" required>
-                                    <label for="floatingPincode">Pincode</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <input type="text" name="city" class="form-control" id="floatingCity"
-                                        placeholder="City" required>
-                                    <label for="floatingCity">City / District</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    <select name="state" class="form-select" id="floatingState" required>
-                                        <option value="" disabled selected>Select State</option>
-                                        <option value="Delhi">Delhi</option>
-                                        <option value="Maharashtra">Maharashtra</option>
-                                        <option value="Karnataka">Karnataka</option>
-                                        <option value="Rajasthan">Rajasthan</option>
-                                    </select>
-                                    <label for="floatingState">State</label>
+                                <div class="border rounded-3 p-3 cursor-pointer" id="newAddressCard"
+                                    onclick="useNewAddress()" style="transition: all 0.2s;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="form-check flex-shrink-0">
+                                            <input class="form-check-input" type="radio" name="address_choice"
+                                                id="new_addr" value="new" onclick="useNewAddress()">
+                                        </div>
+                                        <div>
+                                            <div class="fw-700 text-dark small"><i
+                                                    class="fas fa-plus-circle me-2 text-success"></i>Use a New Address
+                                            </div>
+                                            <div class="text-muted x-small">Enter a different delivery address</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
+
+                        <div id="addressFormFields" {% if current_user.address %}class="d-none" {% endif %}>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="full_name" class="form-control" id="floatingName"
+                                            placeholder="Name" required>
+                                        <label for="floatingName">Full Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="tel" name="mobile_number" class="form-control" id="floatingMobile"
+                                            placeholder="Phone" maxlength="10" required>
+                                        <label for="floatingMobile">Mobile Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" name="address" class="form-control" id="floatingAddress"
+                                            placeholder="Address" required>
+                                        <label for="floatingAddress">Address (Area and Street)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="text" name="pincode" class="form-control" id="floatingPincode"
+                                            placeholder="Pincode" maxlength="6" required>
+                                        <label for="floatingPincode">Pincode</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="text" name="city" class="form-control" id="floatingCity"
+                                            placeholder="City" required>
+                                        <label for="floatingCity">City / District</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select name="state" class="form-select" id="floatingState" required>
+                                            <option value="" disabled selected>Select State</option>
+                                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                            <option value="Assam">Assam</option>
+                                            <option value="Bihar">Bihar</option>
+                                            <option value="Chhattisgarh">Chhattisgarh</option>
+                                            <option value="Goa">Goa</option>
+                                            <option value="Gujarat">Gujarat</option>
+                                            <option value="Haryana">Haryana</option>
+                                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                            <option value="Jharkhand">Jharkhand</option>
+                                            <option value="Karnataka">Karnataka</option>
+                                            <option value="Kerala">Kerala</option>
+                                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                            <option value="Maharashtra">Maharashtra</option>
+                                            <option value="Manipur">Manipur</option>
+                                            <option value="Meghalaya">Meghalaya</option>
+                                            <option value="Mizoram">Mizoram</option>
+                                            <option value="Nagaland">Nagaland</option>
+                                            <option value="Odisha">Odisha</option>
+                                            <option value="Punjab">Punjab</option>
+                                            <option value="Rajasthan">Rajasthan</option>
+                                            <option value="Sikkim">Sikkim</option>
+                                            <option value="Tamil Nadu">Tamil Nadu</option>
+                                            <option value="Telangana">Telangana</option>
+                                            <option value="Tripura">Tripura</option>
+                                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                            <option value="Uttarakhand">Uttarakhand</option>
+                                            <option value="West Bengal">West Bengal</option>
+                                        </select>
+                                        <label for="floatingState">State</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if current_user.address %}
+                        <div id="savedAddressHidden">
+                            <input type="hidden" name="full_name" value="{{ current_user.full_name }}">
+                            <input type="hidden" name="mobile_number" value="{{ current_user.mobile_number or '' }}">
+                            <input type="hidden" name="address" value="{{ current_user.address }}">
+                            <input type="hidden" name="pincode" value="{{ current_user.pincode or '' }}">
+                            <input type="hidden" name="city" value="{{ current_user.city or '' }}">
+                            <input type="hidden" name="state" value="{{ current_user.state or '' }}">
+                        </div>
+                        {% endif %}
+
                     </div>
                 </div>
 
@@ -267,12 +168,12 @@
                         <div class="step-number">2</div>
                         <h6 class="mb-0 fw-700 text-accent">Personalization (Bulk)</h6>
                     </div>
-                    <div class="p-4">
-                        <div class="upload-zone p-4 text-center position-relative mb-3">
-                            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2" id="uploadIcon"></i>
+                    <div class="p-3">
+                        <div class="upload-zone p-3 text-center position-relative mb-2">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-1" id="uploadIcon"></i>
                             <h6 class="fw-600 text-accent mb-1" id="fileName" style="font-size: 0.95rem;">Upload Design
                                 File (Optional)</h6>
-                            <p class="small text-muted mb-0">Applied to the entire order</p>
+                            <p class="small text-muted mb-0">Applied to the entire order (Max 20MB)</p>
                             <input type="file" name="custom_file" id="fileInput"
                                 class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0"
                                 style="cursor: pointer;">
@@ -291,36 +192,40 @@
                         <div class="step-number">3</div>
                         <h6 class="mb-0 fw-700 text-accent">Payment Method</h6>
                     </div>
-                    <div class="p-4">
-                        <div class="payment-tile mb-3 active" onclick="selectPayment('payOnline', this)">
+                    <div class="p-3">
+                        <!-- Option 1: 40% Advance -->
+                        <div class="payment-tile mb-3 active" onclick="selectPayment('pay40', this)">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
                                     <div class="bg-light p-2 rounded-circle me-3">
-                                        <i class="fas fa-globe text-primary"></i>
+                                        <i class="fas fa-percentage text-primary"></i>
                                     </div>
                                     <div>
-                                        <h6 class="fw-700 mb-0 text-accent">Pay Online</h6>
-                                        <small class="text-muted">UPI, Cards, NetBanking</small>
+                                        <h6 class="fw-700 mb-0 text-accent">Mandatory Advance ({{ (mandatory_advance /
+                                            total * 100)|round|int }}%) + COD</h6>
+                                        <small class="text-muted">Pay the required advance to confirm, balance on
+                                            delivery</small>
                                     </div>
                                 </div>
-                                <input class="form-check-input d-none" type="radio" name="payment_method" id="payOnline"
-                                    value="Online" checked>
+                                <input class="form-check-input d-none" type="radio" name="payment_method" id="pay40"
+                                    value="40_advance" checked>
                             </div>
                         </div>
 
-                        <div class="payment-tile" onclick="selectPayment('payCOD', this)">
+                        <!-- Option 2: 100% Full Payment -->
+                        <div class="payment-tile" onclick="selectPayment('pay100', this)">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
                                     <div class="bg-light p-2 rounded-circle me-3">
-                                        <i class="fas fa-money-bill-wave text-success"></i>
+                                        <i class="fas fa-check-double text-success"></i>
                                     </div>
                                     <div>
-                                        <h6 class="fw-700 mb-0 text-accent">Cash on Delivery</h6>
-                                        <small class="text-muted">Pay upon receipt</small>
+                                        <h6 class="fw-700 mb-0 text-accent">Full Online Payment (100%)</h6>
+                                        <small class="text-muted">Pay full amount now for hassle-free delivery</small>
                                     </div>
                                 </div>
-                                <input class="form-check-input d-none" type="radio" name="payment_method" id="payCOD"
-                                    value="COD">
+                                <input class="form-check-input d-none" type="radio" name="payment_method" id="pay100"
+                                    value="100_online">
                             </div>
                         </div>
                     </div>
@@ -330,17 +235,17 @@
 
             <div class="col-lg-5">
                 <div class="summary-card">
-                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                         <h5 class="fw-700 mb-0 text-accent ls-tight">Order Summary</h5>
                         <a href="{{ url_for('user_bp.cart') }}" class="text-decoration-none small fw-bold">Edit Cart</a>
                     </div>
-                    <div class="p-4">
+                    <div class="p-3">
 
                         <div class="cart-items-list">
                             {% for item in cart %}
                             <div class="d-flex align-items-center mb-3">
                                 <div style="position: relative;">
-                                    <img src="{{ url_for('static', filename='uploads/' + item.product.image_file) }}"
+                                    <img src="{{ url_for('static', filename='images/' + item.product.image_file) }}"
                                         class="rounded-3 border" style="width: 60px; height: 60px; object-fit: cover;">
 
                                     <span
@@ -355,7 +260,13 @@
                                     <small class="text-muted" style="font-size: 0.8rem;">Size: {{ item.size }}</small>
                                 </div>
                                 <div class="text-end">
-                                    <div class="fw-700 text-accent small">₹{{ item.product.base_price * item.quantity }}
+                                    <div class="fw-700 text-accent small">
+                                        {% if item.product.get_price_for_quantity(item.quantity) <
+                                            item.product.base_price %} <span
+                                            class="text-muted text-decoration-line-through me-1">₹{{
+                                            item.product.base_price * item.quantity }}</span>
+                                            {% endif %}
+                                            ₹{{ item.product.get_price_for_quantity(item.quantity) * item.quantity }}
                                     </div>
                                     {% if item.product.shipping_charge > 0 %}
                                     <small class="text-muted" style="font-size: 0.7rem;">+₹{{
@@ -366,10 +277,37 @@
                             {% endfor %}
                         </div>
 
+                        <div class="mt-4 mb-3">
+                            <label class="form-label fw-600 small text-muted text-uppercase">Discount Code</label>
+                            <div class="input-group">
+                                <input type="text" id="couponCodeInput" class="form-control bg-light"
+                                    placeholder="Enter code">
+                                <button type="button" id="applyBtn" class="btn btn-dark"
+                                    onclick="applyCouponCart()">Apply</button>
+                                <button type="button" id="removeBtn" class="btn btn-danger d-none"
+                                    onclick="removeCouponCart()">Remove</button>
+                            </div>
+                            <small id="couponMessage" class="d-block mt-2"></small>
+
+                            <input type="hidden" name="coupon_code" id="appliedCouponCode">
+                        </div>
+
                         <div class="border-top border-bottom py-3 my-3">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Subtotal</span>
-                                <span class="fw-600">₹{{ subtotal }}</span>
+                                <span class="fw-600">₹<span id="subtotalAmount">{{ original_subtotal }}</span></span>
+                            </div>
+                            {% if bulk_savings and bulk_savings > 0 %}
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-success"><i class="fas fa-layer-group me-1"></i> Bulk Savings ({{
+                                    ((bulk_savings / original_subtotal) * 100)|round|int }}%)</span>
+                                <span class="fw-600 text-success">-₹{{ "%.2f"|format(bulk_savings) }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between mb-2 d-none" id="discountRow">
+                                <span class="text-success"><i class="fas fa-tag me-1"></i> Coupon Discount (<span
+                                        id="couponPctLabel">0</span>%)</span>
+                                <span class="fw-600 text-success">-₹<span id="discountAmount">0</span></span>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted">Total Shipping</span>
@@ -383,9 +321,16 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="fw-700 h5 mb-0 text-accent">Total</span>
-                            <span class="fw-700 h4 mb-0 text-accent">₹{{ total }}</span>
+                            <span class="fw-700 h4 mb-0 text-accent">₹<span id="grandTotalAmount">{{ total
+                                    }}</span></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="text-muted small fw-600" id="advanceLabel">Mandatory Advance</span>
+                            <span class="text-success fw-bold">₹<span id="advanceAmount">{{
+                                    "%.2f"|format(mandatory_advance) }}</span></span>
                         </div>
 
                         <button type="submit" id="submitBtn" class="btn-pay shadow-sm">
@@ -405,6 +350,44 @@
 </div>
 
 <script>
+    // =========================================
+    // Address Toggle Logic
+    // =========================================
+    const savedAddressCard = document.getElementById('savedAddressCard');
+    const newAddressCard = document.getElementById('newAddressCard');
+    const addressFormFields = document.getElementById('addressFormFields');
+    const savedAddressHidden = document.getElementById('savedAddressHidden');
+
+    function useSavedAddress() {
+        if (!savedAddressCard) return;
+        savedAddressCard.style.background = '#f8faff';
+        savedAddressCard.style.borderLeft = '3px solid var(--accent-color)';
+        newAddressCard.style.background = '';
+        newAddressCard.style.borderLeft = '';
+        if (addressFormFields) addressFormFields.classList.add('d-none');
+        if (savedAddressHidden) {
+            savedAddressHidden.querySelectorAll('input').forEach(i => i.disabled = false);
+            addressFormFields.querySelectorAll('input, select').forEach(i => i.disabled = true);
+        }
+    }
+
+    function useNewAddress() {
+        if (!newAddressCard) return;
+        newAddressCard.style.background = '#f8faff';
+        newAddressCard.style.borderLeft = '3px solid var(--accent-color)';
+        savedAddressCard.style.background = '';
+        savedAddressCard.style.borderLeft = '';
+        if (addressFormFields) addressFormFields.classList.remove('d-none');
+        if (savedAddressHidden) {
+            savedAddressHidden.querySelectorAll('input').forEach(i => i.disabled = true);
+            addressFormFields.querySelectorAll('input, select').forEach(i => i.disabled = false);
+        }
+    }
+
+    if (savedAddressCard) {
+        useSavedAddress();
+    }
+
     // File Upload Visuals
     const fileInput = document.getElementById('fileInput');
     const fileNameDisplay = document.getElementById('fileName');
@@ -413,6 +396,18 @@
 
     fileInput.addEventListener('change', function (e) {
         if (this.files && this.files.length > 0) {
+            const fileSize = this.files[0].size / 1024 / 1024; // in MB
+            if (fileSize > 20) {
+                alert("File size exceeds 20MB. Please upload a smaller file.");
+                this.value = ""; // Clear the input
+                fileNameDisplay.textContent = "Upload Design File (Optional)";
+                fileNameDisplay.classList.remove('text-success');
+                uploadIcon.classList.add('fa-cloud-upload-alt', 'text-muted');
+                uploadIcon.classList.remove('fa-check-circle', 'text-success');
+                uploadZone.style.borderColor = "";
+                uploadZone.style.backgroundColor = "";
+                return;
+            }
             fileNameDisplay.textContent = this.files[0].name;
             fileNameDisplay.classList.add('text-success');
             uploadIcon.classList.remove('fa-cloud-upload-alt', 'text-muted');
@@ -424,15 +419,31 @@
 
     // Payment Selection Logic
     function selectPayment(radioId, tileElement) {
-        // Uncheck all radios visually
         document.querySelectorAll('.payment-tile').forEach(el => el.classList.remove('active'));
-
-        // Check actual radio button
         const radio = document.getElementById(radioId);
         radio.checked = true;
-
-        // Add active style to clicked tile
         tileElement.classList.add('active');
+
+        // Update Summary Display
+        const grandTotal = parseFloat(document.getElementById('grandTotalAmount').textContent);
+        const advanceAmountSpan = document.getElementById('advanceAmount');
+        const advanceLabel = document.getElementById('advanceLabel');
+
+        if (radioId === 'pay100') {
+            advanceAmountSpan.textContent = grandTotal.toFixed(2);
+            advanceLabel.textContent = 'Full Payment (100%)';
+        } else {
+            // Use the base mandatory advance if no coupon, or a adjusted one
+            // For simplicity, we fallback to the server-provided initial mandatory_advance 
+            // if we don't have a complex JS model of per-product advances here.
+            // But we can estimate: (newGrandTotal / oldGrandTotal) * oldMandatoryAdvance
+            const initialTotal = parseFloat("{{ total }}");
+            const initialAdvance = parseFloat("{{ mandatory_advance }}");
+            const adjustedAdvance = (grandTotal / initialTotal) * initialAdvance;
+
+            advanceAmountSpan.textContent = adjustedAdvance.toFixed(2);
+            advanceLabel.textContent = 'Mandatory Advance';
+        }
 
         updateButtonText();
     }
@@ -440,15 +451,128 @@
     // Dynamic Button Text & Color
     function updateButtonText() {
         const btn = document.getElementById('submitBtn');
-        const isCOD = document.getElementById('payCOD').checked;
+        const is100 = document.getElementById('pay100').checked;
 
-        if (isCOD) {
-            btn.innerHTML = 'Place Order (COD) <i class="fas fa-arrow-right ms-2"></i>';
-            btn.classList.add('btn-green'); // Turn Green
+        if (is100) {
+            btn.innerHTML = 'Pay Full Amount <i class="fas fa-check-double ms-2"></i>';
+            btn.classList.add('btn-dark');
         } else {
-            btn.innerHTML = 'Pay Securely <i class="fas fa-lock ms-2"></i>';
-            btn.classList.remove('btn-green'); // Revert to Dark
+            btn.innerHTML = 'Pay Mandatory Advance <i class="fas fa-lock ms-2"></i>';
+            btn.classList.add('btn-dark');
         }
+    }
+</script>
+
+<script>
+    function applyCouponCart() {
+        const codeInput = document.getElementById('couponCodeInput');
+        const code = codeInput.value.trim();
+        const msgDiv = document.getElementById('couponMessage');
+
+        if (!code) {
+            msgDiv.textContent = 'Please enter a coupon code';
+            msgDiv.className = 'd-block mt-2 text-danger small';
+            return;
+        }
+
+        fetch('{{ url_for("user_bp.apply_coupon") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                code: code,
+                is_cart: true
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Formatting success
+                    msgDiv.innerHTML = `<i class="fas fa-check-circle me-1"></i> ${data.message}`;
+                    msgDiv.className = 'd-block mt-2 text-success small fw-bold';
+
+                    // Set hidden input
+                    document.getElementById('appliedCouponCode').value = code;
+
+                    // Recalculate totals
+                    const subtotal = parseFloat("{{ subtotal }}");
+                    const shipping = parseFloat("{{ shipping }}");
+                    const discount = parseFloat(data.discount_amount);
+                    const grandTotal = subtotal + shipping - discount;
+
+                    // Update UI
+                    document.getElementById('discountRow').classList.remove('d-none');
+                    document.getElementById('discountAmount').textContent = discount.toFixed(2);
+                    document.getElementById('couponPctLabel').textContent = data.discount_percentage;
+                    document.getElementById('grandTotalAmount').textContent = grandTotal.toFixed(2);
+
+                    // Simple adjustment for advance
+                    const initialTotal = parseFloat("{{ total }}");
+                    const initialAdvance = parseFloat("{{ mandatory_advance }}");
+                    const is100 = document.getElementById('pay100').checked;
+
+                    if (is100) {
+                        document.getElementById('advanceAmount').textContent = grandTotal.toFixed(2);
+                    } else {
+                        const adjustedAdvance = (grandTotal / initialTotal) * initialAdvance;
+                        document.getElementById('advanceAmount').textContent = adjustedAdvance.toFixed(2);
+                    }
+
+                    // Disable input
+                    codeInput.readOnly = true;
+                    codeInput.classList.add('bg-white');
+
+                    // Toggle buttons
+                    document.getElementById('applyBtn').classList.add('d-none');
+                    document.getElementById('removeBtn').classList.remove('d-none');
+                } else {
+                    msgDiv.innerHTML = `<i class="fas fa-times-circle me-1"></i> ${data.message}`;
+                    msgDiv.className = 'd-block mt-2 text-danger small';
+                }
+            })
+            .catch(err => {
+                console.error('Error applying coupon:', err);
+                msgDiv.textContent = 'Error applying coupon. Please try again.';
+                msgDiv.className = 'd-block mt-2 text-danger small';
+            });
+    }
+
+    function selectCoupon(code) {
+        document.getElementById('couponCodeInput').value = code;
+        applyCouponCart();
+    }
+
+    function removeCouponCart() {
+        const codeInput = document.getElementById('couponCodeInput');
+
+        // Reset inputs
+        codeInput.value = '';
+        codeInput.readOnly = false;
+        codeInput.classList.remove('bg-white');
+
+        // Clear hidden input
+        document.getElementById('appliedCouponCode').value = '';
+
+        // Clear message
+        document.getElementById('couponMessage').innerHTML = '';
+        document.getElementById('couponMessage').className = 'd-block mt-2';
+
+        // Recalculate totals
+        const subtotal = parseFloat("{{ subtotal }}");
+        const shipping = parseFloat("{{ shipping }}");
+        const grandTotal = subtotal + shipping;
+
+        // Update UI
+        document.getElementById('discountRow').classList.add('d-none');
+        document.getElementById('discountAmount').textContent = '0';
+        document.getElementById('grandTotalAmount').textContent = grandTotal.toFixed(2);
+        document.getElementById('advanceAmount').textContent = (grandTotal * 0.4).toFixed(2);
+
+        // Toggle buttons
+        document.getElementById('applyBtn').classList.remove('d-none');
+        document.getElementById('removeBtn').classList.add('d-none');
     }
 </script>
 
