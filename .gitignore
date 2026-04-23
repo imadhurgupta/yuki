@@ -142,8 +142,7 @@ dmypy.json
 *.swo
 
 # Project specific
-yuki.db
-*.sqlite3
+# Removed yuki.db and *.sqlite3 to allow them to be pushed to Vercel
 
 # Secrets and keys
 *.env

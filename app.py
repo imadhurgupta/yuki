@@ -23,10 +23,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change_this_in_production_key')
 app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
 
-# Database Config (SQLite Fixed)
-# Use absolute path to ensure DB is found correctly in Docker/Gunicorn
+# Database Config
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'yuki.db')
+db_url = os.environ.get('DATABASE_URL')
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///' + os.path.join(basedir, 'yuki.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         
 # Mail Configuration
@@ -41,7 +43,10 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('EMAIL_ADDRESS')
 app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static/images')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'zip'}
 app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024 # 20 MB limit
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+try:
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+except OSError:
+    pass # Vercel is read-only, safely ignore if folder creation fails
 
 # --- 2. INITIALIZE EXTENSIONS ---
 db.init_app(app)
