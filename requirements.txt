@@ -4,8 +4,8 @@ Flask-Login
 Werkzeug
 email-validator
 Flask-Mail
-psycopg2-binary
 python-dotenv
 gunicorn
 Authlib
 requests
+psycopg2-binary
