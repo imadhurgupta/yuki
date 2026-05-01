@@ -7,4 +7,5 @@ Flask-Mail
 python-dotenv
 gunicorn
 Authlib
-requests
+requests
+psycopg2-binary

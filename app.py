@@ -1,4 +1,5 @@
 import os
+import psycopg2
 from flask import Flask
 from dotenv import load_dotenv
 from flask_login import LoginManager
@@ -26,6 +27,18 @@ app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
 # Database Config
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_url = os.environ.get('DATABASE_URL')
+
+try:
+    if db_url and ('postgres' in db_url):
+        connection = psycopg2.connect(db_url)
+        print(">> DATABASE CONNECTED SUCCESSFULLY! 🎉")
+        connection.close()
+    else:
+        print(">> NO POSTGRES DATABASE_URL FOUND, SKIPPING PSYCOPG2 TEST")
+except Exception as e:
+    print(f">> DATABASE CONNECTION FAILED: {e}")
+
+
 
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)

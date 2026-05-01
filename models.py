@@ -70,7 +70,7 @@ class Product(db.Model):
     
     # Stock
     stock = db.Column(db.Integer, default=10)
-
+    
     # Payment Policy
     advance_percentage = db.Column(db.Float, default=40.0)
 
