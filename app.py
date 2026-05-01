@@ -31,7 +31,7 @@ db_url = os.environ.get('DATABASE_URL')
 try:
     if db_url and ('postgres' in db_url):
         connection = psycopg2.connect(db_url)
-        print(">> DATABASE CONNECTED SUCCESSFULLY! 🎉")
+        print(">> DATABASE CONNECTED SUCCESSFULLY!")
         connection.close()
     else:
         print(">> NO POSTGRES DATABASE_URL FOUND, SKIPPING PSYCOPG2 TEST")
