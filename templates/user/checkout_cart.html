@@ -245,7 +245,7 @@
                             {% for item in cart %}
                             <div class="d-flex align-items-center mb-3">
                                 <div style="position: relative;">
-                                    <img src="{{ url_for('static', filename='images/' + item.product.image_file) }}"
+                                    <img src="{{ item.product.image_file | cloud_image }}"
                                         class="rounded-3 border" style="width: 60px; height: 60px; object-fit: cover;">
 
                                     <span

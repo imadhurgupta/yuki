@@ -109,7 +109,7 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-shrink-0 position-relative">
                                                 {% if order.product and order.product.image_file %}
-                                                <img src="{{ url_for('static', filename='images/' + order.product.image_file) }}"
+                                                <img src="{{ order.product.image_file | cloud_image }}"
                                                     class="rounded-3 shadow-sm border"
                                                     style="width: 60px; height: 60px; object-fit: cover;">
                                                 {% else %}

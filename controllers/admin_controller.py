@@ -5,19 +5,44 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from models import db, User, Order, Product, Carousel, ProductImage, SiteSetting, Coupon, Category, Review
 
+import cloudinary.uploader
+
 # =========================================================
-# HELPER: Delete File from Disk
+# HELPER: Delete File
 # =========================================================
 def delete_file(filename):
-    """Safely removes a file from the uploads folder."""
-    if filename and filename != 'default.jpg':
+    """Safely removes a file from Cloudinary or local disk."""
+    if not filename or filename == 'default.jpg':
+        return
+        
+    if filename.startswith('http'):
+        # Cloudinary URL format: https://res.cloudinary.com/.../image/upload/v1234567890/public_id.jpg
+        try:
+            public_id = filename.split('/')[-1].split('.')[0]
+            cloudinary.uploader.destroy(public_id)
+            print(f">> Deleted from Cloudinary: {public_id}")
+        except Exception as e:
+            print(f">> Error deleting from Cloudinary: {e}")
+    else:
         try:
             path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             if os.path.exists(path):
                 os.remove(path)
-                print(f">> Deleted old file: {filename}")
+                print(f">> Deleted local file: {filename}")
         except Exception as e:
             print(f">> Error deleting file: {e}")
+
+# =========================================================
+# HELPER: Upload File
+# =========================================================
+def upload_file(file):
+    """Uploads a file to Cloudinary and returns the secure URL."""
+    try:
+        result = cloudinary.uploader.upload(file)
+        return result.get('secure_url')
+    except Exception as e:
+        print(f">> Error uploading to Cloudinary: {e}")
+        return None
 
 # =========================================================
 # ADMIN DASHBOARD
@@ -68,10 +93,7 @@ def add_banner():
         file = request.files.get('image')
         
         if file and file.filename != '':
-            filename = secure_filename(file.filename)
-            unique_name = f"{uuid.uuid4().hex}_{filename}"
-            path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
-            file.save(path)
+            unique_name = upload_file(file) or 'default.jpg'
             
             new_banner = Carousel(title=title, subtitle=subtitle, image_file=unique_name, link=link)
             db.session.add(new_banner)
@@ -108,11 +130,7 @@ def edit_banner(banner_id):
         file = request.files.get('image')
         if file and file.filename != '':
             delete_file(banner.image_file)
-            filename = secure_filename(file.filename)
-            unique_name = f"{uuid.uuid4().hex}_{filename}"
-            path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
-            file.save(path)
-            banner.image_file = unique_name
+            banner.image_file = upload_file(file) or banner.image_file
             
         db.session.commit()
         flash('Banner updated successfully.', 'success')
@@ -152,11 +170,7 @@ def add_product():
             filename = 'default.jpg'
             
             if file and file.filename != '':
-                fname = secure_filename(file.filename)
-                unique_name = f"{uuid.uuid4().hex}_{fname}"
-                path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
-                file.save(path)
-                filename = unique_name
+                filename = upload_file(file) or 'default.jpg'
             
             # 3. Create Product & Commit
             # FIX: Added 'description=description' here
@@ -176,10 +190,8 @@ def add_product():
             gallery_files = request.files.getlist('gallery_images')
             for g_file in gallery_files:
                 if g_file and g_file.filename != '':
-                    g_fname = secure_filename(g_file.filename)
-                    g_unique = f"{uuid.uuid4().hex}_{g_fname}"
-                    g_path = os.path.join(current_app.config['UPLOAD_FOLDER'], g_unique)
-                    g_file.save(g_path)
+                    g_unique = upload_file(g_file)
+                    if not g_unique: continue
                     
                     new_img = ProductImage(image_file=g_unique, product_id=new_product.id)
                     db.session.add(new_img)
@@ -243,20 +255,14 @@ def edit_product(product_id):
             file = request.files.get('image')
             if file and file.filename != '':
                 delete_file(product.image_file) # Remove old
-                fname = secure_filename(file.filename)
-                unique_name = f"{uuid.uuid4().hex}_{fname}"
-                path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
-                file.save(path)
-                product.image_file = unique_name
+                product.image_file = upload_file(file) or product.image_file
 
             # 3. Add NEW Gallery Images
             gallery_files = request.files.getlist('gallery_images')
             for g_file in gallery_files:
                 if g_file and g_file.filename != '':
-                    g_fname = secure_filename(g_file.filename)
-                    g_unique = f"{uuid.uuid4().hex}_{g_fname}"
-                    g_path = os.path.join(current_app.config['UPLOAD_FOLDER'], g_unique)
-                    g_file.save(g_path)
+                    g_unique = upload_file(g_file)
+                    if not g_unique: continue
                     
                     new_img = ProductImage(image_file=g_unique, product_id=product.id)
                     db.session.add(new_img)
@@ -362,18 +368,8 @@ def upload_qr():
             if setting.qr_code_file:
                 delete_file(setting.qr_code_file)
 
-            # Generate Unique Name
-            ext = secure_filename(file.filename).rsplit('.', 1)[1]
-            filename = f"qr_{uuid.uuid4().hex[:8]}.{ext}" 
-            
-            # Ensure folder exists
-            upload_folder = current_app.config['UPLOAD_FOLDER']
-            if not os.path.exists(upload_folder):
-                os.makedirs(upload_folder)
-
-            path = os.path.join(upload_folder, filename)
-            file.save(path)
-            setting.qr_code_file = filename
+            # Upload to Cloudinary
+            setting.qr_code_file = upload_file(file)
             
         db.session.commit()
         flash('Payment settings updated successfully!', 'success')
@@ -476,11 +472,7 @@ def add_category():
             # Update existing
             if file and file.filename != '':
                 delete_file(existing.image_file)
-                filename = secure_filename(file.filename)
-                unique_name = f"{uuid.uuid4().hex}_{filename}"
-                path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
-                file.save(path)
-                existing.image_file = unique_name
+                existing.image_file = upload_file(file) or existing.image_file
                 db.session.commit()
                 flash('Category icon updated successfully.', 'success')
             else:
@@ -488,10 +480,7 @@ def add_category():
         else:
             # Create new
             if file and file.filename != '':
-                filename = secure_filename(file.filename)
-                unique_name = f"{uuid.uuid4().hex}_{filename}"
-                path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name)
-                file.save(path)
+                unique_name = upload_file(file) or 'default.jpg'
                 
                 new_category = Category(name=name, image_file=unique_name)
                 db.session.add(new_category)

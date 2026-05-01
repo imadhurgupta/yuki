@@ -47,7 +47,7 @@
 
                     <div class="qr-container mb-3">
                         {% if qr_code %}
-                        <img src="{{ url_for('static', filename='images/' + qr_code) }}"
+                        <img src="{{ qr_code | cloud_image }}"
                             class="img-fluid border p-2 rounded shadow-sm" style="max-width: 260px; height: auto;">
 
                         {% elif generated_qr_url %}

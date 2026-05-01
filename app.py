@@ -1,5 +1,6 @@
 import os
 import psycopg2
+import cloudinary
 from flask import Flask
 from dotenv import load_dotenv
 from flask_login import LoginManager
@@ -23,6 +24,22 @@ app = Flask(__name__, instance_path='/tmp/instance' if os.environ.get('VERCEL') 
 # Security
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change_this_in_production_key')
 app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
+
+# Cloudinary Config
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+    secure=True
+)
+
+@app.template_filter('cloud_image')
+def cloud_image_filter(filename):
+    if not filename: return ""
+    if filename.startswith('http'):
+        return filename
+    from flask import url_for
+    return url_for('static', filename='images/' + filename)
 
 # Database Config
 basedir = os.path.abspath(os.path.dirname(__file__))

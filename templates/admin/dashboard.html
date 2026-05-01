@@ -205,14 +205,14 @@
                                         <td>
                                             {% if order.product %}
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ url_for('static', filename='images/' + order.product.image_file) }}"
+                                                <img src="{{ order.product.image_file | cloud_image }}"
                                                     width="40" class="rounded me-2">
                                                 <div>
                                                     <div class="fw-bold small">{{ order.product.name }}</div>
                                                     <div class="text-muted small">Qty: {{ order.quantity }} | {{
                                                         order.size }}</div>
                                                     {% if order.customization_file %}
-                                                    <a href="{{ url_for('static', filename='images/' + order.customization_file) }}"
+                                                    <a href="{{ order.customization_file | cloud_image }}"
                                                         class="badge bg-info bg-opacity-10 text-info border border-info text-decoration-none mt-1"
                                                         download>
                                                         <i class="fas fa-cloud-download-alt me-1"></i> User File
@@ -310,7 +310,7 @@
                         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                             <div class="position-relative bg-light text-center"
                                 style="aspect-ratio: 1 / 1; max-height: 250px;">
-                                <img src="{{ url_for('static', filename='images/' + product.image_file) }}"
+                                <img src="{{ product.image_file | cloud_image }}"
                                     class="w-100 h-100 p-3" style="object-fit: contain;">
                                 <span class="position-absolute top-0 start-0 m-3 badge bg-dark shadow-sm">{{
                                     product.section }}</span>
@@ -406,7 +406,7 @@
                                                     style="font-size: 0.75rem;">Optimal resolution: 800x800 pixels (1:1
                                                     ratio). Max 20MB</small>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="{{ url_for('static', filename='images/' + product.image_file) }}"
+                                                    <img src="{{ product.image_file | cloud_image }}"
                                                         class="rounded border me-3"
                                                         style="width: 60px; height: 60px; object-fit: cover;">
                                                     <div class="flex-grow-1"><input type="file" name="image"
@@ -426,7 +426,7 @@
                                                 <div class="d-flex gap-2 flex-wrap">
                                                     {% for img in product.images %}
                                                     <div class="position-relative">
-                                                        <img src="{{ url_for('static', filename='images/' + img.image_file) }}"
+                                                        <img src="{{ img.image_file | cloud_image }}"
                                                             class="rounded border"
                                                             style="width: 50px; height: 50px; object-fit: cover;">
                                                         <a href="{{ url_for('admin_bp.delete_product_image', image_id=img.id) }}"
@@ -473,7 +473,7 @@
 
                                 {% if site_setting and site_setting.qr_code_file %}
                                 <div class="mb-3 p-3 bg-light rounded border position-relative">
-                                    <img src="{{ url_for('static', filename='images/' + site_setting.qr_code_file) }}"
+                                    <img src="{{ site_setting.qr_code_file | cloud_image }}"
                                         class="img-fluid rounded shadow-sm" style="max-height: 180px;">
                                     <div class="mt-2 text-success small fw-bold"><i
                                             class="fas fa-check-circle me-1"></i> Active</div>
@@ -558,7 +558,7 @@
                                             <div class="col-12">
                                                 <div
                                                     class="card border shadow-sm rounded-3 overflow-hidden position-relative group-action">
-                                                    <img src="{{ url_for('static', filename='images/' + banner.image_file) }}"
+                                                    <img src="{{ banner.image_file | cloud_image }}"
                                                         class="card-img-top w-100"
                                                         style="height: 120px; object-fit: cover;">
                                                     <div
@@ -786,7 +786,7 @@
                                             class="card border shadow-sm rounded-3 overflow-hidden text-center position-relative">
                                             <div class="p-3 bg-light"
                                                 style="aspect-ratio: 1/1; display:flex; align-items:center; justify-content:center;">
-                                                <img src="{{ url_for('static', filename='images/' + category.image_file) }}"
+                                                <img src="{{ category.image_file | cloud_image }}"
                                                     class="img-fluid" style="max-height: 100%; object-fit: contain;">
                                             </div>
                                             <div class="card-body p-2">
@@ -839,7 +839,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="small fw-bold d-block mb-2">Current Image</label>
-                        <img src="{{ url_for('static', filename='images/' + banner.image_file) }}"
+                        <img src="{{ banner.image_file | cloud_image }}"
                             class="rounded border mb-2 w-100" style="height: 100px; object-fit: cover;">
                         <label class="small fw-bold">Change Image (Optional) - Max 20MB</label>
                         <input type="file" name="image" class="form-control form-control-sm" accept="image/*">

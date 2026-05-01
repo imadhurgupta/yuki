@@ -23,7 +23,7 @@
                 <div class="mb-3 bg-white rounded-4 shadow-sm d-flex align-items-center justify-content-center overflow-hidden w-100"
                     style="max-width: 450px; aspect-ratio: 1 / 1;">
                     {% if product.image_file %}
-                    <img id="mainImage" src="{{ url_for('static', filename='images/' + product.image_file) }}"
+                    <img id="mainImage" src="{{ product.image_file | cloud_image }}"
                         class="img-fluid hover-zoom" alt="{{ product.name }}"
                         style="max-height: 100%; max-width: 100%; object-fit: contain;">
                     {% else %}
@@ -32,13 +32,13 @@
                 </div>
 
                 <div class="d-flex gap-2 overflow-auto w-100 justify-content-center pb-2">
-                    <img src="{{ url_for('static', filename='images/' + product.image_file) }}"
+                    <img src="{{ product.image_file | cloud_image }}"
                         onclick="changeImage(this.src)"
                         class="rounded-3 border cursor-pointer hover-scale shadow-sm bg-white"
                         style="width: 70px; height: 70px; object-fit: cover;">
 
                     {% for img in product.images %}
-                    <img src="{{ url_for('static', filename='images/' + img.image_file) }}"
+                    <img src="{{ img.image_file | cloud_image }}"
                         onclick="changeImage(this.src)"
                         class="rounded-3 border cursor-pointer hover-scale shadow-sm bg-white"
                         style="width: 70px; height: 70px; object-fit: cover;">
@@ -174,7 +174,7 @@
                     style="aspect-ratio: 1 / 1; max-height: 200px; display: flex; align-items: center; justify-content: center;">
                     <a href="{{ url_for('user_bp.product_detail', product_id=rel_product.id) }}"
                         class="w-100 h-100 d-flex align-items-center justify-content-center">
-                        <img src="{{ url_for('static', filename='images/' + rel_product.image_file) if rel_product.image_file else 'https://via.placeholder.com/300?text=No+Image' }}"
+                        <img src="{{ (rel_product.image_file | cloud_image) if rel_product.image_file else 'https://via.placeholder.com/300?text=No+Image' }}"
                             class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                     </a>
                     <div class="position-absolute top-0 end-0 m-1 m-md-2 badge bg-white text-dark shadow-sm rounded-pill fw-bold"

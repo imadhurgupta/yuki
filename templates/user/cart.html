@@ -27,7 +27,7 @@
                                 <tr>
                                     <td class="ps-4 py-3">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{ url_for('static', filename='images/' + item.product.image_file) }}"
+                                            <img src="{{ item.product.image_file | cloud_image }}"
                                                 class="cart-thumb me-3">
                                             <div>
                                                 <h6 class="mb-0 fw-bold">{{ item.product.name }}</h6>
